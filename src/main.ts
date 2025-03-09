@@ -8,6 +8,8 @@ import PrimeVue from 'primevue/config'
 import Aura from '@primeuix/themes/aura';
 import Material from "@primeuix/themes/material"
 import '../src/shared/assets/main.css'
+import '@fontsource/poppins';
+
 
 
 import App from './App.vue'
@@ -26,6 +28,9 @@ app.use(Toast, toastOptions)
 app.use(PrimeVue, {
   theme: {
     preset: Material,
+    options: {
+      darkModeSelector: '.app-ligh'
+    }
   },
 })
 
