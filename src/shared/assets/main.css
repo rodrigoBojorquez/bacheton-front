@@ -2,10 +2,47 @@
 @import 'primeicons/primeicons.css';
 
 
-:root {
-    --font-poppins: 'Poppins', system-ui, Avenir, 'Helvetica', Arial, sans-serif;
-}
-
 body {
     font-family: var(--font-poppins);
 }
+
+
+:root {
+         --font-poppins: 'Poppins', system-ui, Avenir, 'Helvetica', Arial, sans-serif;
+    
+         --white: #FFFFFF;
+         --gray-light: #BDC7D7;
+         --blue-primary: #5087F7;
+         --blue-light: #8BCFF1;
+         --blue-dark: #120B8F;
+         --turquoise-light: #B1DFE6;
+
+         --c-accent: #5087F7;
+         --c-highlight: #8BCFF1;
+         --body-bg: #FFFFFF;
+       
+         /* Backgrounds */
+         --bg-primary: var(--white);
+         --bg-secondary: var(--gray-light);
+       
+         /* Textos */
+         --text-primary: var(--blue-dark);
+         --text-secondary: var(--blue-primary);
+         --text-subtle: var(--gray-light);
+       
+         /* Buttons */
+         --btn-primary-bg: var(--blue-primary);
+         --btn-primary-hover: var(--blue-dark);
+         --btn-secondary-bg: var(--blue-light);
+         --btn-text: var(--white);
+       
+         /* Cards */
+         --card-bg: var(--white);
+         --card-border: var(--gray-light);
+       
+         /* Borders */
+         --border-color: var(--gray-light);
+       
+         /* Links */
+         --link-color: var(--blue-primary);
+       }
