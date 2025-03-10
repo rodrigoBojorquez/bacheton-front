@@ -32,10 +32,14 @@ export const useAuthStore = defineStore("auth",() => {
       await refreshToken();
     } catch (e) {
       console.error("Error al refrescar token:", e);
+      // Limpieza del estado en caso de error:
+      setAuth(false);
+      setToken(null);
     } finally {
       loading.value = false;
     }
   });
+
 
   return {
     isAuth,

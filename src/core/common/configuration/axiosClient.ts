@@ -28,15 +28,13 @@ apiClient.interceptors.response.use(
     const store = useAuthStore()
     const ogRequest = err.config
 
-    if (err.response?.stxatus === 401 && !ogRequest._retry) {
+    // Verificamos que sea 401, no se haya reintentado y NO sea la ruta de refresh
+    if (err.response?.status === 401 && !ogRequest._retry && !ogRequest.url.includes('/Auth/refresh-token')) {
       ogRequest._retry = true
-
       try {
         const result = await refreshToken()
-        console.log('Token refreshed')
         ogRequest.headers.Authorization = `Bearer ${result.token}`
         return apiClient(ogRequest)
-
       } catch (e) {
         console.error(e)
         store.setToken(null)
@@ -46,3 +44,4 @@ apiClient.interceptors.response.use(
     return Promise.reject(err)
   }
 )
+
