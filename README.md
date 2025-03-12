@@ -66,7 +66,7 @@ Desarrollar una **aplicación web** que permita a los ciudadanos **reportar y da
 
 1. Clonar el repositorio:
    ```sh
-   git clone https://github.com/usuario/bacheton.git
+   git clone https://github.com/rodrigoBojorquez/bacheton-front
    cd bacheton-front
    ```
 
@@ -74,13 +74,17 @@ Desarrollar una **aplicación web** que permita a los ciudadanos **reportar y da
    ```sh
    npm install
    ```
+3. Crear archivo con variables de entorno:
+   ```sh
+   cp .env.example .env
+   ```
 
-3. Ejecutar el proyecto en modo desarrollo:
+4. Ejecutar el proyecto en modo desarrollo:
    ```sh
    npm run dev
    ```
 
-4. Abrir en el navegador `http://localhost:5173`.
+5. Abrir en el navegador `http://localhost:5173`.
 
 ---
 
