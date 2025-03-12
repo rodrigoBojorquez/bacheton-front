@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import {onMounted, ref} from "vue";
-import {refreshToken} from "@/core/services/authService.ts";
+import { refreshToken, showAccess } from '@/core/services/authService.ts'
 import {jwtDecode} from "jwt-decode";
 import type {TokenPayload} from "@/core/types/auth.ts";
 
@@ -30,9 +30,9 @@ export const useAuthStore = defineStore("auth",() => {
   onMounted(async () => {
     try {
       await refreshToken();
+      await showAccess();
     } catch (e) {
       console.error("Error al refrescar token:", e);
-      // Limpieza del estado en caso de error:
       setAuth(false);
       setToken(null);
     } finally {

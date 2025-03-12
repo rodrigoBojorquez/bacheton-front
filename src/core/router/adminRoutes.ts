@@ -9,10 +9,9 @@ const adminRoutes = [
     meta: { requiresAuth: true, requiresAdminAccess: true },
     children: [
       {
-        path: "panel",
+        path: "dashboard",
         name: "admin-dashboard",
         component: DashboardView
-
       },
 
     ]
