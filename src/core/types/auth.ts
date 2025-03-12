@@ -19,4 +19,20 @@ interface TokenPayload extends JwtPayload {
   permissions: string
 }
 
-export type { LoginRequest, RegisterRequest, AuthResponse, TokenPayload }
+interface AccessLevel {
+  modules: ModuleAccess[]
+  rootPath: string
+}
+
+interface ModuleAccess {
+  name: string
+  icon?: string
+  permissions: PermissionPolicy[]
+}
+
+interface PermissionPolicy {
+  name: string
+  clientPath?: string
+}
+
+export type { LoginRequest, RegisterRequest, AuthResponse, TokenPayload, AccessLevel }

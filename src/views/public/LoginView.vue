@@ -122,7 +122,7 @@ import { loginSchema } from "@/core/schemas/auth.ts";
 import { useRouter } from "vue-router";
 
 // ---- Composables y Stores propios ----
-import { useLogin } from "@/core/services/authService.ts";
+import { showAccess, useLogin } from '@/core/services/authService.ts'
 import { useGetErrorMessage } from "@/core/common/composables/errorHooks.ts";
 import { useAuthStore } from "@/core/stores/authStore.ts";
 
@@ -171,12 +171,13 @@ const onSubmit = handleSubmit(async (values) => {
   errorMessage.value = null; // Limpiamos errores previos
 
   login(values, {
-    onSuccess: () => {
+    onSuccess: async () => {
+      const accessLevel = await showAccess()
       authStore.setAuth(true); // Marcamos que el usuario está autenticado
-      router.push({ name: "admin-dashboard" });
+      await router.push(accessLevel.rootPath); // Redireccionamos a la ruta correspondiente
     },
     onError: (error) => {
-      errorMessage.value = useGetErrorMessage(error); // Mensaje de error del backend
+      errorMessage.value = useGetErrorMessage(error);
     },
   });
 });

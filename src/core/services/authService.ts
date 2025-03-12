@@ -1,5 +1,10 @@
 import {apiClient} from "@/core/common/configuration/axiosClient.ts";
-import type {AuthResponse, LoginRequest, RegisterRequest} from "@/core/types/auth.ts";
+import type {
+  AccessLevel,
+  AuthResponse,
+  LoginRequest,
+  RegisterRequest
+} from '@/core/types/auth.ts'
 import {useToastMutation} from "@/core/common/composables/serviceHooks.ts";
 import {useMutation} from "@tanstack/vue-query";
 import {useAuthStore} from "@/core/stores/authStore.ts"
@@ -24,6 +29,17 @@ export const refreshToken = async (): Promise<AuthResponse> => {
 
     return res.data
   } catch (e) {
+    console.error(e)
+    throw e
+  }
+}
+
+export const showAccess = async (): Promise<AccessLevel> => {
+  try {
+    const res = await apiClient.post<AccessLevel>('/Auth/show-access')
+    return res.data
+  }
+  catch (e) {
     console.error(e)
     throw e
   }
