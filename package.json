@@ -15,10 +15,9 @@
   "dependencies": {
     "@fontsource/poppins": "^5.2.5",
     "@primeuix/themes": "^1.0.0",
-    "@rollup/rollup-linux-x64-gnu": "^4.35.0",
-    "@tailwindcss/oxide-linux-x64-gnu": "^4.0.12",
     "@tailwindcss/vite": "^4.0.12",
     "@tanstack/vue-query": "^5.66.3",
+    "@vee-validate/rules": "^4.15.0",
     "@vee-validate/yup": "^4.15.0",
     "axios": "^1.7.9",
     "jwt-decode": "^4.0.0",

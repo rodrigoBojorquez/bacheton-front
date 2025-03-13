@@ -25,6 +25,18 @@ import { layoutConfig, getPresetExt } from './shared/layouts/composables/layout'
 // Importa la interfaz que definiste
 import type { PrimeUixTheme } from './core/types/primeuix-theme'
 import Menu from 'primevue/menu';
+import Button from 'primevue/button';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
+import InputText from 'primevue/inputtext';
+import Password from 'primevue/password';
+import Dialog from 'primevue/dialog';
+import Select from 'primevue/select';
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
+import Toolbar from 'primevue/toolbar';
+import MultiSelect from 'primevue/multiselect';
+
 
 // Configuración de Toast
 const toastOptions: PluginOptions = {
@@ -51,6 +63,7 @@ app.use(VueQueryPlugin);
 app.use(ToastService);
 app.use(ConfirmationService);
 
+
 app.use(PrimeVue, {
   theme: {
     preset: mergedPreset,
@@ -62,5 +75,16 @@ app.use(PrimeVue, {
 
 app.component('PrimeToast', PrimeToast);
 app.component('PrimeMenu', Menu);
+app.component('Button', Button);
+app.component('Column', Column);
+app.component('DataTable', DataTable);
+app.component('InputText', InputText);
+app.component('Password', Password);
+app.component('Dialog', Dialog);
+app.component('Select', Select);
+app.component('IconField', IconField);
+app.component('InputIcon', InputIcon);
+app.component('Toolbar', Toolbar);
+app.component('MultiSelect', MultiSelect);
 
 app.mount('#app');

@@ -1,10 +1,15 @@
 interface Permission {
-  id: string
-  name: string
-  module: {
-    id: string
-    name: string
-  }
+  id: string;
+  name: string;
+  displayName: string;
+  icon: string;
+  moduleName: string;
 }
 
-export type { Permission }
+interface UpdatePermissionRequest {
+  id: string;
+  displayName: string;
+  icon: string;
+}
+
+export type { Permission, UpdatePermissionRequest };

@@ -7,27 +7,27 @@
    * Peticiones
    */
 
-  export async function listUsers(page: number, pageSize: number, search?: string): Promise<ListResponse<User>> {
-    const {data} = await apiClient.get('/users', {
-      params: {page, pageSize, search}
+  export async function listUsers(page?: number, pageSize?: number, search?: string): Promise<ListResponse<User>> {
+    const {data} = await apiClient.get('/Users', {
+      params: { ...(page && { page }), ...(pageSize && { pageSize }), ...(search && { search }) }
     });
     return data;
   }
 
   export const getUser = async (id: string) : Promise<User> => {
-    return (await apiClient.get(`/users/${id}`)).data
+    return (await apiClient.get(`/Users/${id}`)).data
   }
 
   const editUser = async (data: EditUserRequest) => {
-    await apiClient.put(`/users`, data);
+    await apiClient.put(`/Users`, data);
   };
 
   const deleteUser = async(id: string) => {
-    await apiClient.delete(`/users/${id}`)
+    await apiClient.delete(`/Users/${id}`)
   }
 
   const addUser = async (request: AddUserRequest) => {
-    await apiClient.post(`/users`, request)
+    await apiClient.post(`/Users`, request)
   }
 
 
@@ -38,7 +38,7 @@
     return useToastMutation<void, EditUserRequest>(
       editUser,
       {
-        mutationKey: ["users"],
+        mutationKey: ["Users"],
       },
       {
         success: "Usuario editado",
@@ -50,7 +50,7 @@
     return useToastMutation<void, string>(
       deleteUser,
       {
-        mutationKey: ["users"]
+        mutationKey: ["Users"]
       }, {
         success: "Usuario eliminado"
       }
@@ -61,7 +61,7 @@
     return useToastMutation<void, AddUserRequest>(
       addUser,
       {
-        mutationKey: ["users"]
+        mutationKey: ["Users"]
       }, {
         success: "Usuario creado 😃"
       }
