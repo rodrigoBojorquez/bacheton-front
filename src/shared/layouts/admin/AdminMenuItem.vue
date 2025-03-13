@@ -114,7 +114,7 @@ function checkActiveRoute(item: MenuItem): boolean {
       @click="itemClick($event, item)"
       :class="[item.class, { 'active-route': checkActiveRoute(item) }]"
       tabindex="0"
-      :to="{ name: 'admin-dashboard' }"
+      :to="item.to"
     >
       <i :class="item.icon" class="layout-menuitem-icon"></i>
       <span class="layout-menuitem-text">{{ item.label }}</span>
