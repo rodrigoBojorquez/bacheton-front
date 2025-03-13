@@ -16,8 +16,29 @@ interface MenuItem {
 const model = ref<MenuItem[]>([
   {
     label: 'Home',
-    items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
+    items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/admin/dashboard' }]
   },
+  {
+        label: 'Gestión de Usuarios',
+        icon: 'pi pi-fw pi-users',
+        items: [
+          {
+            label: 'Usuarios',
+            icon: 'pi pi-fw pi-id-card',
+            to: '/admin/users'
+          },
+          {
+            label: 'Roles',
+            icon: 'pi pi-fw pi-address-book',
+            to: '/admin/roles'
+          },
+          {
+            label: 'Permisos',
+            icon: 'pi pi-fw pi-lock',
+            to: '/admin/permissions'
+          }
+        ]
+      },
   {
     label: 'UI Components',
     items: [
