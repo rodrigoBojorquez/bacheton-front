@@ -5,6 +5,7 @@ import {storeToRefs} from "pinia";
 import authRoutes from "@/core/router/authRoutes.ts";
 import publicRoutes from "@/core/router/publicRoutes.ts";
 import adminRoutes from "@/core/router/adminRoutes.ts";
+import userRoutes from "@/core/router/userRoutes.ts";
 /* import {isSuperAdmin} from "@/core/common/composables/authUtilities.ts"; */
 
 const router = createRouter({
@@ -13,6 +14,7 @@ const router = createRouter({
     ...authRoutes,
     ...publicRoutes,
     ...adminRoutes,
+    ...userRoutes,
     {
       path: "/:pathMatch(.*)*",
       name: "not-found",
@@ -48,5 +50,5 @@ router.beforeEach (async (to) => {
 });
 
 router.afterEach((to) => {
-  document.title = to.meta.title ? `Vortex - ${to.meta.title as string}` : "Bacheton - App"
+  document.title = to.meta.title ? `Bacheton - ${to.meta.title as string}` : "Bacheton - App"
 })
