@@ -1,21 +1,23 @@
 <template>
   <div class="layout-topbar">
     <div class="layout-topbar-logo-container">
-      <button class="layout-menu-button layout-topbar-action" @click="toggleMenu">
+      <button class="layout-menu-button layout-topbar-action" @click="layoutStore.toggleMenu">
         <i class="pi pi-bars"></i>
       </button>
       <router-link :to="{ name: 'dashboard' }" class="layout-topbar-logo">
-
         <MyLogo />
-                <span>BACHETON</span>
-            </router-link>
+        <span>BACHETON</span>
+      </router-link>
     </div>
 
     <div class="layout-topbar-actions">
       <div class="layout-config-menu">
-        <button type="button" class="layout-topbar-action" @click="toggleDarkMode">
-          <i :class="['pi', { 'pi-moon': isDarkTheme, 'pi-sun': !isDarkTheme }]"></i>
+        <!-- Dark Mode Toggle -->
+        <button type="button" class="layout-topbar-action" @click="layoutStore.toggleDarkMode">
+          <i :class="['pi', { 'pi-moon': layoutStore.layoutConfig.darkTheme, 'pi-sun': !layoutStore.layoutConfig.darkTheme }]"></i>
         </button>
+
+        <!-- AppConfigurator -->
         <div class="relative">
           <button
             v-styleclass="{
@@ -35,6 +37,7 @@
         </div>
       </div>
 
+      <!-- Extra Menu -->
       <button
         class="layout-topbar-menu-button layout-topbar-action"
         v-styleclass="{
@@ -49,11 +52,9 @@
         <i class="pi pi-ellipsis-v"></i>
       </button>
 
-      <!-- Botón Profile que dispara el menú de AdminToggle -->
+      <!-- Quick Menu -->
       <div class="layout-topbar-menu hidden lg:block">
         <div class="layout-topbar-menu-content">
-
-          <!-- Otros botones, por ejemplo, Calendar o Messages -->
           <button type="button" class="layout-topbar-action">
             <i class="pi pi-calendar"></i>
             <span>Calendar</span>
@@ -69,7 +70,6 @@
         </div>
       </div>
 
-      <!-- Se monta el componente AdminToggle -->
       <AdminToggle ref="adminToggleRef" />
     </div>
   </div>
@@ -77,15 +77,15 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useLayout } from '../composables/layout';
+import { useLayoutStore } from '@/core/stores/useLayoutStore';
 import AppConfigurator from '../AppConfigurator.vue';
 import AdminToggle from './AdminToggle.vue';
 import MyLogo from '../../assets/LogoBacheton.vue';
 
-const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
+
+const layoutStore = useLayoutStore();
 const adminToggleRef = ref<InstanceType<typeof AdminToggle> | null>(null);
 
-// Función para mostrar el menú de AdminToggle al hacer clic en "Profile"
 const toggleAdminMenu = (event: MouseEvent): void => {
   adminToggleRef.value?.toggleMenu(event);
 };
@@ -100,4 +100,3 @@ export default {
   }
 }
 </script>
-
