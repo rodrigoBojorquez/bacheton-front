@@ -1,5 +1,6 @@
 <template>
-  <div class="layout-topbar">
+  <div class="layout-topbar relative"> <!-- Relative necesario -->
+    <!-- Logo y Botón menú -->
     <div class="layout-topbar-logo-container">
       <button class="layout-menu-button layout-topbar-action" @click="layoutStore.toggleMenu">
         <i class="pi pi-bars"></i>
@@ -10,34 +11,28 @@
       </router-link>
     </div>
 
+    <!-- Acciones del Topbar -->
     <div class="layout-topbar-actions">
       <div class="layout-config-menu">
-        <!-- Dark Mode Toggle -->
+        <!-- Botón Modo Oscuro -->
         <button type="button" class="layout-topbar-action" @click="layoutStore.toggleDarkMode">
           <i :class="['pi', { 'pi-moon': layoutStore.layoutConfig.darkTheme, 'pi-sun': !layoutStore.layoutConfig.darkTheme }]"></i>
         </button>
 
-        <!-- AppConfigurator -->
+        <!-- Botón Configurador -->
         <div class="relative">
           <button
-            v-styleclass="{
-              selector: '@next',
-              enterFromClass: 'hidden',
-              enterActiveClass: 'animate-scalein',
-              leaveToClass: 'hidden',
-              leaveActiveClass: 'animate-fadeout',
-              hideOnOutsideClick: true
-            }"
+            ref="configButtonRef"
             type="button"
             class="layout-topbar-action layout-topbar-action-highlight"
+            @click="toggleConfigurator"
           >
             <i class="pi pi-palette"></i>
           </button>
-          <AppConfigurator />
         </div>
       </div>
 
-      <!-- Extra Menu -->
+      <!-- Menú Extra -->
       <button
         class="layout-topbar-menu-button layout-topbar-action"
         v-styleclass="{
@@ -52,7 +47,7 @@
         <i class="pi pi-ellipsis-v"></i>
       </button>
 
-      <!-- Quick Menu -->
+      <!-- Menú Rápido -->
       <div class="layout-topbar-menu hidden lg:block">
         <div class="layout-topbar-menu-content">
           <button type="button" class="layout-topbar-action">
@@ -70,30 +65,72 @@
         </div>
       </div>
 
+      <!-- Menú Perfil -->
       <AdminToggle ref="adminToggleRef" />
     </div>
+
+    <!-- Configurador SIEMPRE cargado, solo controlado por v-show -->
+    <AppConfigurator
+      ref="configPanelRef"
+      v-show="layoutStore.isConfiguratorOpen"
+      @closeConfigurator="closeConfigurator"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useLayoutStore } from '@/core/stores/useLayoutStore';
 import AppConfigurator from '../AppConfigurator.vue';
 import AdminToggle from './AdminToggle.vue';
 import MyLogo from '../../assets/LogoBacheton.vue';
 
-
 const layoutStore = useLayoutStore();
 const adminToggleRef = ref<InstanceType<typeof AdminToggle> | null>(null);
+const configPanelRef = ref<InstanceType<typeof AppConfigurator> | null>(null);
+const configButtonRef = ref<HTMLButtonElement | null>(null);
 
 const toggleAdminMenu = (event: MouseEvent): void => {
   adminToggleRef.value?.toggleMenu(event);
 };
+
+// Toggle del ConfigPanel
+const toggleConfigurator = () => {
+  layoutStore.setConfiguratorOpen(!layoutStore.isConfiguratorOpen);
+};
+
+// Cierra configurador
+const closeConfigurator = () => {
+  layoutStore.setConfiguratorOpen(false);
+};
+
+// Detecta click fuera
+const handleClickOutside = (event: MouseEvent) => {
+  const configuratorEl = configPanelRef.value?.$el;
+  const buttonEl = configButtonRef.value;
+
+  if (
+    layoutStore.isConfiguratorOpen &&
+    configuratorEl &&
+    !configuratorEl.contains(event.target) &&
+    buttonEl &&
+    !buttonEl.contains(event.target as Node)
+  ) {
+    layoutStore.setConfiguratorOpen(false);
+  }
+};
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
 </script>
 
 <script lang="ts">
 import StyleClass from 'primevue/styleclass';
-
 export default {
   directives: {
     styleclass: StyleClass

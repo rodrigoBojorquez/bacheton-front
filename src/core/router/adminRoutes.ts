@@ -31,14 +31,6 @@ const adminRoutes = [
         name: "permissions",
         component: PermissionsCRUD
       },
-
-
-
-
-
-
-
-
       {
         path: "logs",
         name: "logs",

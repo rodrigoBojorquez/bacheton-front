@@ -1,4 +1,3 @@
-<!-- UsersCRUD.vue -->
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useToast } from 'primevue/usetoast';
@@ -16,7 +15,7 @@ const deleteUserDialog = ref(false);
 const isEditMode = ref(false);
 const submitted = ref(false);
 
-// Formulario para creación/edición
+// Formulario para creación/edición (NO incluye id como editable)
 const userForm = ref<Partial<AddUserRequest & { id?: string }>>({
   name: '',
   email: '',
@@ -24,12 +23,10 @@ const userForm = ref<Partial<AddUserRequest & { id?: string }>>({
   roleId: ''
 });
 
-// Filtros globales para DataTable
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
 
-// Lista de roles para el dropdown
 const roles = ref<Role[]>([]);
 
 onMounted(async () => {
@@ -63,8 +60,7 @@ function openNew() {
 }
 
 function editUser(user: User) {
-  // Se carga el usuario y se limpia la contraseña (si es necesario)
-  userForm.value = { ...user, password: '' };
+  userForm.value = { ...user, password: '' }; // No mostramos contraseña actual
   isEditMode.value = true;
   submitted.value = false;
   userDialog.value = true;
@@ -74,7 +70,6 @@ const addUserMutation = useAddUser();
 const editUserMutation = useEditUser();
 const deleteUserMutation = useDeleteUser();
 
-// Función para validar la contraseña
 function validPassword(pwd: string): boolean {
   const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
   return regex.test(pwd);
@@ -83,12 +78,11 @@ function validPassword(pwd: string): boolean {
 async function saveUser() {
   submitted.value = true;
 
-  // Validaciones de campos obligatorios
   if (!userForm.value.name?.trim() || !userForm.value.email?.trim() || !userForm.value.roleId?.trim()) {
     return;
   }
 
-  // Validación de contraseña (solo para creación)
+  // Contraseña obligatoria SOLO para creación
   if (!isEditMode.value) {
     if (!userForm.value.password?.trim()) {
       return;
@@ -100,13 +94,10 @@ async function saveUser() {
 
   try {
     if (isEditMode.value && userForm.value.id) {
-      // Editar usuario: se actualiza en el backend...
       await editUserMutation.mutateAsync(userForm.value as EditUserRequest);
     } else {
-      // Agregar usuario
       await addUserMutation.mutateAsync(userForm.value as AddUserRequest);
     }
-    // Se recarga la lista de usuarios para reflejar los cambios
     await loadUsers();
     userDialog.value = false;
     userForm.value = { name: '', email: '', password: '', roleId: '' };
@@ -134,7 +125,6 @@ async function deleteUser() {
 
 <template>
   <div class="max-w-7xl mx-auto p-4">
-    <!-- Toolbar -->
     <Toolbar class="flex flex-col md:flex-row items-center justify-between mb-4 gap-4">
       <template #start>
         <Button label="Nuevo" icon="pi pi-plus"
@@ -148,7 +138,6 @@ async function deleteUser() {
       </template>
     </Toolbar>
 
-    <!-- DataTable con selección y filtrado -->
     <DataTable
       :value="users"
       selectionMode="multiple"
@@ -176,6 +165,7 @@ async function deleteUser() {
       </template>
 
       <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+      <Column field="id" header="ID" sortable class="py-2 px-4" />
       <Column field="name" header="Nombre" sortable class="py-2 px-4" />
       <Column field="email" header="Email" sortable class="py-2 px-4" />
       <Column field="roleName" header="Rol" sortable class="py-2 px-4" />
@@ -211,17 +201,19 @@ async function deleteUser() {
           <InputText id="email" v-model="userForm.email" class="mt-1 block w-full border border-gray-300 rounded-md p-2" />
           <small v-if="submitted && !userForm.email?.trim()" class="p-error text-red-500">El email es obligatorio.</small>
         </div>
-        <!-- Sólo para creación -->
-        <div v-if="!isEditMode">
+
+        <!-- Contraseña editable pero opcional en edición -->
+        <div>
           <label for="password" class="block text-sm font-medium primary">
-            Contraseña <span class="text-red-500">*</span>
+            Contraseña <span v-if="!isEditMode" class="text-red-500">*</span>
           </label>
           <Password id="password" v-model="userForm.password" toggleMask class="mt-1 block w-full border border-gray-300 rounded-md p-2" />
-          <small v-if="submitted && !userForm.password?.trim()" class="p-error">La contraseña es obligatoria.</small>
+          <small v-if="submitted && !userForm.password?.trim() && !isEditMode" class="p-error text-red-500">La contraseña es obligatoria.</small>
           <small v-if="submitted && userForm.password?.trim() && !validPassword(userForm.password)" class="p-error text-red-500">
             La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.
           </small>
         </div>
+
         <div>
           <label for="roleId" class="block text-sm font-medium primary">
             Rol <span class="text-red-500">*</span>

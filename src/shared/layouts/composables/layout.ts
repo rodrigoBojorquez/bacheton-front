@@ -1,50 +1,10 @@
-import { computed, reactive } from 'vue';
-import { updatePreset, updateSurfacePalette } from '@primeuix/themes';
-
-interface LayoutConfig {
-  preset: string;
-  primary: string;
-  surface: string | null;
-  darkTheme: boolean;
-  menuMode: string;
-}
-
-interface LayoutState {
-  staticMenuDesktopInactive: boolean;
-  overlayMenuActive: boolean;
-  profileSidebarVisible: boolean;
-  configSidebarVisible: boolean;
-  staticMenuMobileActive: boolean;
-  menuHoverActive: boolean;
-  activeMenuItem: unknown;
-}
-
-// Establecemos "sky" como primary y "slate" como surface por defecto
-const layoutConfig = reactive<LayoutConfig>({
-  preset: 'Aura',
-  primary: 'sky',
-  surface: 'slate',
-  darkTheme: false,
-  menuMode: 'static'
-});
-
-const layoutState = reactive<LayoutState>({
-  staticMenuDesktopInactive: false,
-  overlayMenuActive: false,
-  profileSidebarVisible: false,
-  configSidebarVisible: false,
-  staticMenuMobileActive: false,
-  menuHoverActive: false,
-  activeMenuItem: null
-});
-
+// src/shared/layouts/composables/layout.ts
 export interface ColorOption {
   name: string;
-  palette: Record<string, string>; // QUITA el Partial
+  palette: Record<string, string>;
 }
 
-
-// Se exporta el array extendido de colores primarios (se incluyeron todos los códigos desde AppConfigurator.vue)
+// Colores primarios disponibles
 export const primaryColors: ColorOption[] = [
   { name: 'noir', palette: {} },
   {
@@ -305,14 +265,10 @@ export const primaryColors: ColorOption[] = [
   }
 ];
 
-/**
- * Función para obtener el preset actual basado en el color primario.
- * En este refactor se integra la lógica completa (incluyendo el manejo especial para 'noir')
- * y se exporta para que pueda ser utilizada en main.ts y AppConfigurator.vue.
- */
-export function getPresetExt() {
-  const color = primaryColors.find(c => c.name === layoutConfig.primary);
-  if (!color) throw new Error(`Color not found: ${layoutConfig.primary}`);
+// Obtener preset extendido basado en el color primario
+export function getPresetExt(primaryColorName: string) {
+  const color = primaryColors.find(c => c.name === primaryColorName);
+  if (!color) throw new Error(`Color not found: ${primaryColorName}`);
 
   if (color.name === 'noir') {
     return {
@@ -356,60 +312,3 @@ export function getPresetExt() {
     };
   }
 }
-
-export function useLayout() {
-  const setActiveMenuItem = (item: { value?: unknown } | unknown): void => {
-    if (item && typeof item === 'object' && 'value' in item) {
-      layoutState.activeMenuItem = (item as { value: unknown }).value;
-    } else {
-      layoutState.activeMenuItem = item;
-    }
-  };
-
-  const executeDarkModeToggle = (): void => {
-    layoutConfig.darkTheme = !layoutConfig.darkTheme;
-    document.documentElement.classList.toggle('app-dark');
-  };
-
-  const toggleDarkMode = (): void => {
-    if (!document.startViewTransition) {
-      executeDarkModeToggle();
-      return;
-    }
-    document.startViewTransition(() => executeDarkModeToggle());
-  };
-
-  const toggleMenu = (): void => {
-    if (layoutConfig.menuMode === 'overlay') {
-      layoutState.overlayMenuActive = !layoutState.overlayMenuActive;
-    }
-    if (window.innerWidth > 991) {
-      layoutState.staticMenuDesktopInactive = !layoutState.staticMenuDesktopInactive;
-    } else {
-      layoutState.staticMenuMobileActive = !layoutState.staticMenuMobileActive;
-    }
-  };
-
-  const isSidebarActive = computed<boolean>(
-    () => layoutState.overlayMenuActive || layoutState.staticMenuMobileActive
-  );
-  const isDarkTheme = computed<boolean>(() => layoutConfig.darkTheme);
-  const getPrimary = computed<string>(() => layoutConfig.primary);
-  const getSurface = computed<string | null>(() => layoutConfig.surface);
-
-  return {
-    layoutConfig,
-    layoutState,
-    toggleMenu,
-    isSidebarActive,
-    isDarkTheme,
-    getPrimary,
-    getSurface,
-    setActiveMenuItem,
-    toggleDarkMode,
-    updatePreset,
-    updateSurfacePalette
-  };
-}
-
-export { layoutConfig, layoutState };

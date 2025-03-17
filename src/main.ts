@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import { VueQueryPlugin } from '@tanstack/vue-query';
 import type { PluginOptions } from 'vue-toastification';
+import { VueQueryPlugin } from '@tanstack/vue-query';
 import Toast, { POSITION } from 'vue-toastification';
 import PrimeVue from 'primevue/config';
 
@@ -11,17 +11,14 @@ import router from './core/router';
 import '@/shared/assets/main.css';
 import '@fontsource/poppins';
 import 'vue-toastification/dist/index.css';
-import './shared/assets/styles.scss';
+import '../src/shared/assets/styles.scss';
 
 import ConfirmationService from 'primevue/confirmationservice';
 import ToastService from 'primevue/toastservice';
 import PrimeToast from 'primevue/toast';
-
-import merge from 'lodash.merge';
-import Aura from '@primeuix/themes/aura';
 import { getPresetExt } from './shared/layouts/composables/layout';
-import { useLayoutStore } from './core/stores/useLayoutStore';
 
+// PrimeVue components
 import Menu from 'primevue/menu';
 import Button from 'primevue/button';
 import Column from 'primevue/column';
@@ -35,6 +32,10 @@ import InputIcon from 'primevue/inputicon';
 import Toolbar from 'primevue/toolbar';
 import MultiSelect from 'primevue/multiselect';
 
+// Import Store
+import { useLayoutStore } from '@/core/stores/useLayoutStore';
+
+// --- Configuración de Toast ---
 const toastOptions: PluginOptions = {
   position: POSITION.TOP_RIGHT,
   timeout: 1000
@@ -42,33 +43,26 @@ const toastOptions: PluginOptions = {
 
 const app = createApp(App);
 
-const pinia = createPinia();
-app.use(pinia);
-const layoutStore = useLayoutStore();
+// --- Pinia y Router ---
+app.use(createPinia());
+app.use(router);
 
-const auraPreset = Aura;
-const presetExt = getPresetExt();
-const mergedPreset = merge({}, auraPreset, presetExt);
+// --- Toasts, Vue Query, PrimeVue Services ---
+app.use(Toast, toastOptions);
+app.use(VueQueryPlugin);
+app.use(ToastService);
+app.use(ConfirmationService);
 
+// --- PrimeVue Configuración ---
 app.use(PrimeVue, {
   theme: {
-    preset: mergedPreset,
     options: {
       darkModeSelector: '.app-dark'
     }
   }
 });
 
-if (layoutStore.layoutConfig.darkTheme) {
-  document.documentElement.classList.add('app-dark');
-}
-
-app.use(router);
-app.use(Toast, toastOptions);
-app.use(VueQueryPlugin);
-app.use(ToastService);
-app.use(ConfirmationService);
-
+// --- PrimeVue Components Globally ---
 app.component('PrimeToast', PrimeToast);
 app.component('PrimeMenu', Menu);
 app.component('Button', Button);
@@ -82,5 +76,11 @@ app.component('IconField', IconField);
 app.component('InputIcon', InputIcon);
 app.component('Toolbar', Toolbar);
 app.component('MultiSelect', MultiSelect);
+
+// --- Inicializar configuración de Layout ---
+const layoutStore = useLayoutStore();
+layoutStore.applyFullTheme();
+
+const skyPreset = getPresetExt(layoutStore.layoutConfig.primary || 'sky');
 
 app.mount('#app');
