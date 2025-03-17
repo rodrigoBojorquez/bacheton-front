@@ -39,6 +39,10 @@ const model = ref<MenuItem[]>([
           }
         ]
       },
+      {
+    label: 'Gestión de Sistema',
+    items: [{ label: 'Logs', icon: 'pi pi-fw pi-list', to: '/admin/logs' }]
+  },
   {
     label: 'UI Components',
     items: [

@@ -3,6 +3,7 @@ import AdminDashboard from "@/shared/layouts/admin/AdminDashboard.vue";
 import DashboardView from "@/views/admin/dashboard/DashboardView.vue";
 import PermissionsCRUD from "@/views/admin/Permisions/PermissionsCRUD.vue";
 import RolesCRUD from "@/views/admin/roles/RolesCRUD.vue";
+import LogsView from "@/views/admin/logs/LogsView.vue";
 
 const adminRoutes = [
   {
@@ -30,7 +31,11 @@ const adminRoutes = [
         name: "permissions",
         component: PermissionsCRUD
       },
-
+      {
+        path: "logs",
+        name: "logs",
+        component: LogsView
+      },
     ]
   }
 ]
