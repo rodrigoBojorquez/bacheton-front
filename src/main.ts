@@ -1,29 +1,24 @@
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import type { PluginOptions } from 'vue-toastification'
-import { VueQueryPlugin } from '@tanstack/vue-query'
-import Toast, { POSITION } from 'vue-toastification'
-import PrimeVue from 'primevue/config'
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
+import type { PluginOptions } from 'vue-toastification';
+import { VueQueryPlugin } from '@tanstack/vue-query';
+import Toast, { POSITION } from 'vue-toastification';
+import PrimeVue from 'primevue/config';
 
-import App from './App.vue'
-import router from './core/router'
+import App from './App.vue';
+import router from './core/router';
 
-import '@/shared/assets/main.css'
-import '@fontsource/poppins'
-import 'vue-toastification/dist/index.css'
-import '../src/shared/assets/styles.scss'
+import '@/shared/assets/main.css';
+import '@fontsource/poppins';
+import 'vue-toastification/dist/index.css';
+import '../src/shared/assets/styles.scss';
 
-import ConfirmationService from 'primevue/confirmationservice'
-import ToastService from 'primevue/toastservice'
-import PrimeToast from 'primevue/toast'
+import ConfirmationService from 'primevue/confirmationservice';
+import ToastService from 'primevue/toastservice';
+import PrimeToast from 'primevue/toast';
+import { getPresetExt } from './shared/layouts/composables/layout';
 
-// Importaciones de merge manual, tema Aura y tu layout
-import merge from 'lodash.merge'
-import Aura from '@primeuix/themes/aura'
-import { layoutConfig, getPresetExt } from './shared/layouts/composables/layout'
-
-// Importa la interfaz que definiste
-import type { PrimeUixTheme } from './core/types/primeuix-theme'
+// PrimeVue components
 import Menu from 'primevue/menu';
 import Button from 'primevue/button';
 import Column from 'primevue/column';
@@ -37,42 +32,37 @@ import InputIcon from 'primevue/inputicon';
 import Toolbar from 'primevue/toolbar';
 import MultiSelect from 'primevue/multiselect';
 
+// Import Store
+import { useLayoutStore } from '@/core/stores/useLayoutStore';
 
-// Configuración de Toast
+// --- Configuración de Toast ---
 const toastOptions: PluginOptions = {
   position: POSITION.TOP_RIGHT,
   timeout: 1000
 };
 
-layoutConfig.primary = 'sky';
-layoutConfig.surface = 'slate';
-
-// Castea Aura y tu preset a la interfaz PrimeUixTheme
-const auraPreset: PrimeUixTheme = Aura;
-const skyPreset: PrimeUixTheme = getPresetExt();
-
-
-const mergedPreset: PrimeUixTheme = merge({}, auraPreset, skyPreset);
-
 const app = createApp(App);
 
+// --- Pinia y Router ---
 app.use(createPinia());
 app.use(router);
+
+// --- Toasts, Vue Query, PrimeVue Services ---
 app.use(Toast, toastOptions);
 app.use(VueQueryPlugin);
 app.use(ToastService);
 app.use(ConfirmationService);
 
-
+// --- PrimeVue Configuración ---
 app.use(PrimeVue, {
   theme: {
-    preset: mergedPreset,
     options: {
       darkModeSelector: '.app-dark'
     }
   }
 });
 
+// --- PrimeVue Components Globally ---
 app.component('PrimeToast', PrimeToast);
 app.component('PrimeMenu', Menu);
 app.component('Button', Button);
@@ -86,5 +76,11 @@ app.component('IconField', IconField);
 app.component('InputIcon', InputIcon);
 app.component('Toolbar', Toolbar);
 app.component('MultiSelect', MultiSelect);
+
+// --- Inicializar configuración de Layout ---
+const layoutStore = useLayoutStore();
+layoutStore.applyFullTheme();
+
+const skyPreset = getPresetExt(layoutStore.layoutConfig.primary || 'sky');
 
 app.mount('#app');

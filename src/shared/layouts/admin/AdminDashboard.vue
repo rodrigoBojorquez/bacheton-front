@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { useLayout } from '../composables/layout';
+import { useLayoutStore } from '@/core/stores/useLayoutStore'; // Cambio aquí
 import { computed, ref, watch } from 'vue';
 import AppFooter from './AdminFooter.vue';
 import AppSidebar from './AdminSidebar.vue';
 import AppTopbar from './AdminTopBar.vue';
 
-const { layoutConfig, layoutState, isSidebarActive } = useLayout();
+const layoutStore = useLayoutStore(); // Uso del store
 
 const outsideClickListener = ref<EventListener | null>(null);
 
-watch(isSidebarActive, (newVal: boolean) => {
+// Observamos el estado del sidebar
+watch(() => layoutStore.isSidebarActive, (newVal: boolean) => {
   if (newVal) {
     bindOutsideClickListener();
   } else {
@@ -17,23 +18,25 @@ watch(isSidebarActive, (newVal: boolean) => {
   }
 });
 
+// Computed para las clases del contenedor
 const containerClass = computed(() => {
   return {
-    'layout-overlay': layoutConfig.menuMode === 'overlay',
-    'layout-static': layoutConfig.menuMode === 'static',
-    'layout-static-inactive': layoutState.staticMenuDesktopInactive && layoutConfig.menuMode === 'static',
-    'layout-overlay-active': layoutState.overlayMenuActive,
-    'layout-mobile-active': layoutState.staticMenuMobileActive
+    'layout-overlay': layoutStore.layoutConfig.menuMode === 'overlay',
+    'layout-static': layoutStore.layoutConfig.menuMode === 'static',
+    'layout-static-inactive': layoutStore.layoutState.staticMenuDesktopInactive && layoutStore.layoutConfig.menuMode === 'static',
+    'layout-overlay-active': layoutStore.layoutState.overlayMenuActive,
+    'layout-mobile-active': layoutStore.layoutState.staticMenuMobileActive
   };
 });
 
+// Click fuera del menú
 function bindOutsideClickListener(): void {
   if (!outsideClickListener.value) {
     outsideClickListener.value = (event: Event): void => {
       if (isOutsideClicked(event as MouseEvent)) {
-        layoutState.overlayMenuActive = false;
-        layoutState.staticMenuMobileActive = false;
-        layoutState.menuHoverActive = false;
+        layoutStore.layoutState.overlayMenuActive = false;
+        layoutStore.layoutState.staticMenuMobileActive = false;
+        layoutStore.layoutState.menuHoverActive = false;
       }
     };
     document.addEventListener('click', outsideClickListener.value);

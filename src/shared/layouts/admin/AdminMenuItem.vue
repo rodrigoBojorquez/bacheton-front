@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { onBeforeMount, ref, watch } from 'vue'
-import type { PropType } from 'vue'
-import { useRoute } from 'vue-router'
-import { useLayout } from '../composables/layout'
+import { onBeforeMount, ref, watch } from 'vue';
+import type { PropType } from 'vue';
+import { useRoute } from 'vue-router';
+import { useLayoutStore } from '@/core/stores/useLayoutStore'; // CAMBIO AQUÍ
 
-// Define el nombre del componente para que se resuelva recursivamente
 defineOptions({
   name: 'app-menu-item'
-})
+});
 
 interface MenuItem {
   label?: string;
@@ -23,7 +22,7 @@ interface MenuItem {
 }
 
 const route = useRoute();
-const { layoutState, setActiveMenuItem, toggleMenu } = useLayout();
+const layoutStore = useLayoutStore(); // USAMOS EL STORE
 
 const props = defineProps({
   item: {
@@ -52,15 +51,14 @@ onBeforeMount(() => {
     ? props.parentItemKey + '-' + props.index
     : String(props.index);
 
-  // Cast a string para poder usar startsWith sin error
-  const activeItem = layoutState.activeMenuItem as string;
+  const activeItem = layoutStore.layoutState.activeMenuItem as string;
   isActiveMenu.value =
     activeItem === itemKey.value ||
     !!(activeItem && activeItem.startsWith(itemKey.value + '-'));
 });
 
 watch(
-  () => layoutState.activeMenuItem as string,
+  () => layoutStore.layoutState.activeMenuItem as string,
   (newVal: string) => {
     isActiveMenu.value =
       newVal === itemKey.value || !!(newVal && newVal.startsWith(itemKey.value + '-'));
@@ -73,8 +71,8 @@ function itemClick(event: MouseEvent, item: MenuItem): void {
     return;
   }
 
-  if ((item.to || item.url) && (layoutState.staticMenuMobileActive || layoutState.overlayMenuActive)) {
-    toggleMenu();
+  if ((item.to || item.url) && (layoutStore.layoutState.staticMenuMobileActive || layoutStore.layoutState.overlayMenuActive)) {
+    layoutStore.toggleMenu(); // USAMOS FUNCIONES DEL STORE
   }
 
   if (item.command) {
@@ -84,13 +82,14 @@ function itemClick(event: MouseEvent, item: MenuItem): void {
   const foundItemKey = item.items
     ? (isActiveMenu.value ? props.parentItemKey : itemKey)
     : itemKey.value;
-  setActiveMenuItem(foundItemKey);
+  layoutStore.setActiveMenuItem(foundItemKey); // USAMOS FUNCIONES DEL STORE
 }
 
 function checkActiveRoute(item: MenuItem): boolean {
   return route.path === item.to;
 }
 </script>
+
 
 <template>
   <li :class="{ 'layout-root-menuitem': root, 'active-menuitem': isActiveMenu }">
