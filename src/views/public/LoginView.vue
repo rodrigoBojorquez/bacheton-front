@@ -190,7 +190,7 @@ const onSubmit = handleSubmit(async (values) => {
 
 onMounted(() => {
   if (authStore.isAuth) {
-    router.push({ name: 'admin-dashboard' });
+    router.push({ name: 'dashboard' });
   }
   window.addEventListener('resize', handleResize);
 });
