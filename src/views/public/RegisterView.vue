@@ -178,7 +178,7 @@ import { primaryColors } from '@/shared/layouts/composables/layout';
 import { useForm, useField } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/yup';
 import { registerSchema } from '@/core/schemas/auth';
-import { useRegister } from '@/core/services/authService.ts';
+import { showAccess, useRegister } from '@/core/services/authService.ts'
 import { useGetErrorMessage } from '@/core/common/composables/errorHooks.ts';
 import MyLogo from '../../shared/assets/LogoBacheton.vue';
 
@@ -249,10 +249,11 @@ const onSubmit = handleSubmit(async (values) => {
   errorMessage.value = null;
   const payload = { name: values.name, email: values.email, password: values.password };
   registerUser(payload, {
-    onSuccess: (res) => {
+    onSuccess: async (res) => {
       authStore.setAuth(true);
+      const accessLevel = await showAccess();
       authStore.setToken(res.token);
-      router.push({ name: 'admin-dashboard' });
+      await router.push(accessLevel.rootPath);
     },
     onError: (err) => {
       errorMessage.value = useGetErrorMessage(err);

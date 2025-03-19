@@ -37,6 +37,10 @@ export const refreshToken = async (): Promise<AuthResponse> => {
 export const showAccess = async (): Promise<AccessLevel> => {
   try {
     const res = await apiClient.post<AccessLevel>('/Auth/show-access')
+
+    const store = useAuthStore()
+    store.setAccessLevel(res.data)
+
     return res.data
   }
   catch (e) {
