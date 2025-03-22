@@ -117,6 +117,7 @@ async function loadReports() {
     }
 }
 
+
 // Crear InfoWindow con componente Vue
 function createInfoWindowWithVue(report: Report, marker: google.maps.Marker): void {
     if (!map.value || !infoWindow.value) return;
@@ -302,23 +303,45 @@ async function handleDeleteReport() {
     try {
         await deleteReportMutation.mutateAsync(selectedReport.value.id);
 
-        // Crear un nuevo array para asegurar reactividad
-        reports.value = reports.value.filter(r => r.id !== selectedReport.value?.id);
+        // Cerrar diálogo
+        deleteDialog.value = false;
 
         // Cerrar cualquier InfoWindow abierto
         closeAllInfoWindows();
 
-        // Actualizar marcadores
-        updateMapMarkers();
-        deleteDialog.value = false;
+        // Limpiar completamente todos los marcadores
+        markers.value.forEach(marker => marker.setMap(null));
+        markers.value = [];
 
-        // Refrescar vista completa
-        await refreshMapView();
+        // Forzar reinicio completo del mapa
+        if (map.value) {
+            const center = map.value.getCenter();
+            const zoom = map.value.getZoom();
+
+            // Reiniciar el mapa con la misma configuración
+            map.value = new window.google.maps.Map(mapContainer.value, {
+                zoom: zoom,
+                center: center,
+                mapTypeId: window.google.maps.MapTypeId.ROADMAP,
+                mapTypeControl: true
+            });
+
+            infoWindow.value = new window.google.maps.InfoWindow();
+        }
+
+        // Cargar datos frescos
+        await loadReports();
+
     } catch (error) {
         console.error("Error al eliminar reporte:", error);
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Error al eliminar el reporte' });
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error al eliminar el reporte'
+        });
     }
 }
+
 
 // Cargar script de Google Maps
 function loadGoogleMapsScript() {
