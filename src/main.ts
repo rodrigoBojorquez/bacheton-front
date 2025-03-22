@@ -32,6 +32,15 @@ import InputIcon from 'primevue/inputicon';
 import Toolbar from 'primevue/toolbar';
 import MultiSelect from 'primevue/multiselect';
 
+// Importaciones de componentes PrimeVue para el Mapa
+import Tag from 'primevue/tag';
+import ProgressSpinner from 'primevue/progressspinner';
+import Card from 'primevue/card';
+import Textarea from 'primevue/textarea';
+import Dropdown from 'primevue/dropdown';
+import Calendar from 'primevue/calendar';
+import Tooltip from 'primevue/tooltip';
+
 // Import Store
 import { useLayoutStore } from '@/core/stores/useLayoutStore';
 
@@ -76,6 +85,16 @@ app.component('IconField', IconField);
 app.component('InputIcon', InputIcon);
 app.component('Toolbar', Toolbar);
 app.component('MultiSelect', MultiSelect);
+
+//Nuevos componentes del mapa
+app.component('Tag', Tag);
+app.component('ProgressSpinner', ProgressSpinner);
+app.component('Card', Card);
+app.component('Calendar', Calendar);
+app.component('Textarea', Textarea);
+app.component('Dropdown', Dropdown);
+app.directive('tooltip', Tooltip);
+
 
 // --- Inicializar configuración de Layout ---
 const layoutStore = useLayoutStore();
