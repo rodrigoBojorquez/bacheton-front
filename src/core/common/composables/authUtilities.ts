@@ -10,18 +10,21 @@ export function isSuperAdmin() {
 
 export function mapPermissionsToMenu(
   permissionToRouteMap: PermissionToRouteMap,
-  accessLevel: AccessLevel
+  accessLevel: AccessLevel,
 ): MenuItem[] {
-  if (!accessLevel || !accessLevel.modules) return [];
+  if (!accessLevel || !accessLevel.modules) return []
 
   return Object.entries(permissionToRouteMap)
     .map(([parentLabel, { links }]) => {
-      const filteredLinks = links.filter(link => {
-        const userModule = accessLevel.modules.find(m => m.name === link.module);
-        return userModule && link.permissions.some(p => userModule.permissions.map(up => up.name).includes(p));
-      });
+      const filteredLinks = links.filter((link) => {
+        const userModule = accessLevel.modules.find((m) => m.name === link.module)
+        return (
+          userModule &&
+          link.permissions.some((p) => userModule.permissions.map((up) => up.name).includes(p))
+        )
+      })
 
-      if (filteredLinks.length === 0) return null;
+      if (filteredLinks.length === 0) return null
 
       return {
         name: parentLabel,
@@ -30,72 +33,75 @@ export function mapPermissionsToMenu(
           icon: link.icon,
           link: link.route,
         })),
-      } as MenuItem;
+      } as MenuItem
     })
-    .filter((item): item is MenuItem => item !== null);
-
+    .filter((item): item is MenuItem => item !== null)
 }
 
-export  const permissionToRouteMap: PermissionToRouteMap = {
-  "Inicio": {
+export const permissionToRouteMap: PermissionToRouteMap = {
+  Inicio: {
     links: [
       {
         module: 'Administracion',
-        permissions: ["dashboard"],
+        permissions: ['superAdmin'],
         icon: 'pi pi-fw pi-home',
         name: 'Inicio',
         route: '/admin/dashboard',
       },
+    ],
+  },
+  Administracion: {
+    links: [
       {
-        module: "Administracion",
-        permissions: ["logs"],
-        name: "Logs",
-        route: "/admin/logs",
-        icon: "pi pi-fw pi-list",
-      }
+        module: 'Administracion',
+        permissions: ['logs'],
+        name: 'Logs',
+        route: '/admin/logs',
+        icon: 'pi pi-fw pi-list',
+      },
     ],
   },
   'Gestion de Usuarios': {
     links: [
       {
-        module: "Usuarios",
-        permissions: ["read"],
+        module: 'Usuarios',
+        permissions: ['read'],
         name: 'Usuarios',
         route: '/admin/users',
         icon: 'pi pi-fw pi-users',
       },
       {
-        module: "Roles",
-        permissions: ["read"],
+        module: 'Roles',
+        permissions: ['read'],
         name: 'Roles',
         route: '/admin/roles',
         icon: 'pi pi-fw pi-id-card',
       },
       {
-        module: "Permisos",
-        permissions: ["read"],
+        module: 'Permisos',
+        permissions: ['read'],
         name: 'Permisos',
         route: '/admin/permissions',
         icon: 'pi pi-fw pi-lock',
       },
     ],
   },
-  "Reportes": {
+  Reportes: {
     links: [
       {
         module: 'Reportes',
-        permissions: ["read"],
-        name: "Reportes",
-        route: "/admin/reports",
-        icon: "pi pi-fw pi-chart-bar"
+        permissions: ['read'],
+        name: 'Reportes',
+        route: '/admin/reports',
+        icon: 'pi pi-fw pi-chart-bar',
       },
       {
-        module: "Reportes",
-        permissions: ["monitoring", "read"],
-        name: "Mapa",
-        route: "/admin/map",
-        icon: "pi pi-fw pi-map"
-      }
-    ]
-  }
+        module: 'Reportes',
+        permissions: ['monitoring', 'read'],
+        name: 'Mapa',
+        route: '/admin/map',
+        icon: 'pi pi-fw pi-map',
+      },
+    ],
+  },
 }
