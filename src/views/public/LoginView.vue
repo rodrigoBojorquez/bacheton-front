@@ -73,7 +73,9 @@
             label="Correo Electrónico"
             placeholder="ejemplo@correo.com"
             required
+            @keypress="blockEmailSpecialChars"
           />
+
           <FormInput
             v-model="password"
             :errorMessage="errors.password"
@@ -122,6 +124,22 @@ import FormInput from '@/shared/components/FormInput.vue';
 import MyLogo from '../../shared/assets/LogoBacheton.vue';
 import { useLayoutStore } from '@/core/stores/useLayoutStore';
 import { primaryColors } from '@/shared/layouts/composables/layout';
+
+// Bloquea caracteres no válidos en el email al escribir
+function blockEmailSpecialChars(event: KeyboardEvent) {
+  const allowedChars = /^[a-zA-Z0-9@._\-]$/;
+  if (!allowedChars.test(event.key)) {
+    event.preventDefault();
+  }
+}
+
+// Sanitiza el input antes de enviar
+function sanitizeInput(input: string): string {
+  const div = document.createElement('div');
+  div.textContent = input;
+  return div.innerHTML.trim();
+}
+
 
 const screenWidth = ref(window.innerWidth);
 const isSmallScreen = computed(() => screenWidth.value < 1024);
@@ -176,7 +194,11 @@ const { mutate: login, isPending: isLoading } = useLogin();
 
 const onSubmit = handleSubmit(async (values) => {
   errorMessage.value = null;
-  login(values, {
+
+  // Sanitizamos el email antes de enviar
+  const sanitizedEmail = sanitizeInput(values.email);
+
+  login({ ...values, email: sanitizedEmail }, {
     onSuccess: async () => {
       const accessLevel = await showAccess();
       authStore.setAuth(true);
@@ -187,6 +209,7 @@ const onSubmit = handleSubmit(async (values) => {
     },
   });
 });
+
 
 onMounted(() => {
   if (authStore.isAuth) {

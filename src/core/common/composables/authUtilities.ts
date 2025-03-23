@@ -45,7 +45,7 @@ export const permissionToRouteMap: PermissionToRouteMap = {
         module: 'Administracion',
         permissions: ['superAdmin'],
         icon: 'pi pi-fw pi-home',
-        name: 'Inicio',
+        name: 'Dashboard',
         route: '/admin/dashboard',
       },
     ],

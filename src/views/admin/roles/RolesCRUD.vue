@@ -107,7 +107,9 @@
             id="name"
             v-model="roleForm.name"
             class="mt-1 block w-full border border-gray-300 rounded-md p-2"
+            @keypress="(e) => preventInvalidInput(e, 'name')"
           />
+
           <small
             v-if="submitted && !roleForm.name?.trim()"
             class="p-error text-red-500"
@@ -123,7 +125,9 @@
             id="description"
             v-model="roleForm.description"
             class="mt-1 block w-full border border-gray-300 rounded-md p-2"
+            @keypress="(e) => preventInvalidInput(e, 'description')"
           />
+
         </div>
         <div>
           <label for="permissions" class="block text-sm font-medium">
@@ -161,8 +165,9 @@
             </template>
 
             <!-- Icono del filtro -->
-            <template #filtericon>
-              <i class="pi pi-map-marker"></i>
+            <template #filtericon >
+              <span class="pr-2">Selecciona los permisos del Rol</span>
+              <i class="pi pi-lock"></i>
             </template>
 
             <!-- Header del menú desplegable -->
@@ -173,8 +178,7 @@
             <!-- Footer del menú desplegable -->
             <template #footer>
               <div class="p-3 flex justify-between">
-                <Button label="Agregar nuevo" severity="secondary" text size="small" icon="pi pi-plus" />
-                <Button label="Quitar todos" severity="danger" text size="small" icon="pi pi-times" />
+
               </div>
             </template>
           </MultiSelect>
@@ -244,6 +248,7 @@ import type { Role, AddRoleRequest, EditRoleRequest } from '@/core/types/role';
 import type { Permission } from '@/core/types/permission';
 import { FilterMatchMode } from '@primevue/core/api';
 
+// Variables
 const toast = useToast();
 const roles = ref<Role[]>([]);
 const selectedRoles = ref<Role[]>([]);
@@ -252,17 +257,15 @@ const deleteRoleDialog = ref(false);
 const isEditMode = ref(false);
 const submitted = ref(false);
 
-// Formulario para creación/edición de roles
+// Formulario
 const roleForm = ref<Partial<AddRoleRequest & { id?: string }>>({
   name: '',
   permissions: [],
   description: ''
 });
 
-// Lista completa de permisos (con ícono, nombre y módulo)
+// Permisos
 const allPermissions = ref<Permission[]>([]);
-
-// Mapeo id -> Permission para facilitar la búsqueda en la tabla
 const permissionMap = computed(() => {
   const map: Record<string, Permission> = {};
   allPermissions.value.forEach((p) => {
@@ -271,7 +274,6 @@ const permissionMap = computed(() => {
   return map;
 });
 
-// MultiSelect: Se guarda en el formulario el arreglo de strings con los IDs de los permisos seleccionados
 const selectedPermissionObjects = computed<Permission[]>({
   get() {
     return (roleForm.value.permissions || []).map((id) =>
@@ -283,11 +285,25 @@ const selectedPermissionObjects = computed<Permission[]>({
   }
 });
 
-// Filtros globales para DataTable
+// Filtros
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
 
+// Sanitización funciones
+function sanitizeInput(value: string, type: 'name' | 'description'): string {
+  let sanitized = value;
+
+  if (type === 'name') {
+    sanitized = sanitized.replace(/[^a-zA-Z0-9À-ÿ\u00f1\u00d1\s]/g, '');
+  } else if (type === 'description') {
+    sanitized = sanitized.replace(/[^a-zA-Z0-9À-ÿ\u00f1\u00d1\s.,:;!?()\-]/g, '');
+  }
+
+  return sanitized;
+}
+
+// Carga inicial
 onMounted(async () => {
   await loadRoles();
   await loadAllPermissions();
@@ -319,23 +335,29 @@ function openNew() {
 }
 
 function editRole(role: Role) {
-  // Cargamos el rol en el formulario para edición
   roleForm.value = { ...role };
   isEditMode.value = true;
   submitted.value = false;
   roleDialog.value = true;
 }
 
+// Mutations
 const addRoleMutation = useAddRole();
 const editRoleMutation = useEditRole();
 const deleteRoleMutation = useDeleteRole();
 
 async function saveRole() {
   submitted.value = true;
-  // Validación: se requiere nombre y al menos un permiso seleccionado
-  if (!roleForm.value.name?.trim() || !roleForm.value.permissions || roleForm.value.permissions.length === 0) {
+
+  // Sanitizamos antes de enviar
+  roleForm.value.name = sanitizeInput(roleForm.value.name || '', 'name').trim();
+  roleForm.value.description = sanitizeInput(roleForm.value.description || '', 'description').trim();
+
+  // Validaciones
+  if (!roleForm.value.name || !roleForm.value.permissions || roleForm.value.permissions.length === 0) {
     return;
   }
+
   try {
     if (isEditMode.value && roleForm.value.id) {
       await editRoleMutation.mutateAsync(roleForm.value as EditRoleRequest);
@@ -365,4 +387,17 @@ async function deleteRole() {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Error al eliminar el rol' });
   }
 }
+
+// Prevención: bloquea escritura de caracteres peligrosos
+function preventInvalidInput(event: KeyboardEvent, type: 'name' | 'description') {
+  const char = String.fromCharCode(event.which);
+  const regex = type === 'name'
+    ? /^[a-zA-Z0-9À-ÿ\u00f1\u00d1\s]$/
+    : /^[a-zA-Z0-9À-ÿ\u00f1\u00d1\s.,:;!?()\-]$/;
+
+  if (!regex.test(char)) {
+    event.preventDefault();
+  }
+}
 </script>
+

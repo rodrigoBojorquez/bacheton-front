@@ -2,6 +2,7 @@
   <div>
     <!-- Menú de PrimeVue en modo popup -->
     <Menu ref="menu" class="p-4 m-4" :model="items" :popup="true" />
+    <Profile ref="profileRef" />
   </div>
 </template>
 
@@ -11,6 +12,9 @@ import { useRouter } from 'vue-router';
 import Menu from 'primevue/menu';
 import { useLogout } from '@/core/services/authService.ts';
 import { useAuthStore } from '@/core/stores/authStore.ts';
+import Profile from './Profile.vue';
+
+const profileRef = ref<InstanceType<typeof Profile> | null>(null);
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -33,7 +37,7 @@ const items = [
     label: 'Perfil',
     icon: 'pi pi-user',
     command: () => {
-      router.push('/perfil'); // Ajusta la ruta según tu configuración
+      profileRef.value?.openDialog();
     }
   },
   {

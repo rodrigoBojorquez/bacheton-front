@@ -16,8 +16,12 @@ interface AuthResponse {
 }
 
 interface TokenPayload extends JwtPayload {
+  name: string
+  role: string
   permissions: string
+  nameid: string
 }
+
 
 interface AccessLevel {
   modules: ModuleAccess[]
