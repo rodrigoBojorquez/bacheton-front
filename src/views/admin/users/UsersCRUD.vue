@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useToast } from 'primevue/usetoast';
 import { listUsers, useAddUser, useEditUser, useDeleteUser } from '@/core/services/userService';
 import { listRoles } from '@/core/services/rolesService';
 import type { User, AddUserRequest, EditUserRequest } from '@/core/types/user';
 import type { Role } from '@/core/types/role';
 import { FilterMatchMode } from '@primevue/core/api';
 
-const toast = useToast();
 const users = ref<User[]>([]);
 const selectedUsers = ref<User[]>([]);
 const userDialog = ref(false);
@@ -39,7 +37,7 @@ async function loadUsers() {
     const response = await listUsers();
     users.value = response.items;
   } catch {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Error cargando usuarios' });
+
   }
 }
 
@@ -48,7 +46,7 @@ async function loadRoles() {
     const response = await listRoles();
     roles.value = response.items;
   } catch {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Error cargando roles' });
+
   }
 }
 
@@ -60,7 +58,7 @@ function openNew() {
 }
 
 function editUser(user: User) {
-  userForm.value = { ...user, password: '' }; // No mostramos contraseña actual
+  userForm.value = { ...user, password: '' };
   isEditMode.value = true;
   submitted.value = false;
   userDialog.value = true;
@@ -102,7 +100,7 @@ async function saveUser() {
     userDialog.value = false;
     userForm.value = { name: '', email: '', password: '', roleId: '' };
   } catch {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Error al guardar el usuario' });
+
   }
 }
 
@@ -118,7 +116,7 @@ async function deleteUser() {
     deleteUserDialog.value = false;
     userForm.value = { name: '', email: '', password: '', roleId: '' };
   } catch {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Error al eliminar el usuario' });
+
   }
 }
 </script>
@@ -207,7 +205,7 @@ async function deleteUser() {
           <label for="password" class="block text-sm font-medium primary">
             Contraseña <span v-if="!isEditMode" class="text-red-500">*</span>
           </label>
-          <Password id="password" v-model="userForm.password" toggleMask class="mt-1 block w-full border border-gray-300 rounded-md p-2" />
+          <Password id="password" v-model="userForm.password" toggleMask :feedback="false" class="mt-1 block w-full border border-gray-300 rounded-md p-2" />
           <small v-if="submitted && !userForm.password?.trim() && !isEditMode" class="p-error text-red-500">La contraseña es obligatoria.</small>
           <small v-if="submitted && userForm.password?.trim() && !validPassword(userForm.password)" class="p-error text-red-500">
             La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.
