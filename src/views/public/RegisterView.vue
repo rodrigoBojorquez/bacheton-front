@@ -49,40 +49,44 @@
 
         <form class="space-y-6" @submit.prevent="onSubmit">
           <!-- Campo Nombre -->
-          <div>
-            <label for="name" class="block text-md font-medium mb-1">Nombre <span class="text-red-500">*</span></label>
-            <input
-              v-model="name"
-              id="name"
-              type="text"
-              class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 outline-none"
-              :class="{'border-red-500': nameError}"
-              :style="{
-                borderColor: surface700,
-                '--tw-ring-color': primaryDark
-              }"
-              placeholder="Tu nombre"
-            />
-            <p v-if="nameError" class="text-red-500 text-sm mt-1">{{ nameError }}</p>
-          </div>
+         <!-- Campo Nombre -->
+<div>
+  <label for="name" class="block text-md font-medium mb-1">Nombre <span class="text-red-500">*</span></label>
+  <input
+    v-model="name"
+    id="name"
+    type="text"
+    class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 outline-none"
+    :class="{'border-red-500': nameError}"
+    :style="{
+      borderColor: surface700,
+      '--tw-ring-color': primaryDark
+    }"
+    @keypress="blockSpecialChars"
+    placeholder="Tu nombre"
+  />
+  <p v-if="nameError" class="text-red-500 text-sm mt-1">{{ nameError }}</p>
+</div>
 
-          <!-- Campo Email -->
-          <div>
-            <label for="email" class="block text-md font-medium mb-1">Correo Electrónico <span class="text-red-500">*</span></label>
-            <input
-              v-model="email"
-              id="email"
-              type="email"
-              class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 outline-none"
-              :class="{'border-red-500': emailError}"
-              :style="{
-                borderColor: surface700,
-                '--tw-ring-color': primaryDark
-              }"
-              placeholder="ejemplo@correo.com"
-            />
-            <p v-if="emailError" class="text-red-500 text-sm mt-1">{{ emailError }}</p>
-          </div>
+<!-- Campo Email -->
+<div>
+  <label for="email" class="block text-md font-medium mb-1">Correo Electrónico <span class="text-red-500">*</span></label>
+  <input
+    v-model="email"
+    id="email"
+    type="email"
+    class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 outline-none"
+    :class="{'border-red-500': emailError}"
+    :style="{
+      borderColor: surface700,
+      '--tw-ring-color': primaryDark
+    }"
+    @keypress="blockEmailSpecialChars"
+    placeholder="ejemplo@correo.com"
+  />
+  <p v-if="emailError" class="text-red-500 text-sm mt-1">{{ emailError }}</p>
+</div>
+
 
           <!-- Contraseña y Confirmación -->
           <div class="grid grid-cols-2 gap-4">
@@ -101,7 +105,7 @@
                 }"
                 placeholder="Contraseña segura"
               />
-              <button type="button" class="absolute right-2 top-9 text-gray-500" @click="toggleShowPassword">
+              <button type="button" class="absolute right-2 top-10 text-gray-500 cursor-pointer" @click="toggleShowPassword" tabindex="-1">
                 <i :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
               </button>
               <p v-if="passwordError" class="text-red-500 text-sm mt-1">{{ passwordError }}</p>
@@ -124,7 +128,7 @@
                 }"
                 placeholder="Repite tu contraseña"
               />
-              <button type="button" class="absolute right-2 top-9 text-gray-500" @click="toggleShowConfirmPassword">
+              <button type="button" class="absolute right-2 top-10 text-gray-500 cursor-pointer" @click="toggleShowConfirmPassword" tabindex="-1">
                 <i :class="showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
               </button>
               <p v-if="passwordConfirmationError" class="text-red-500 text-sm mt-1">{{ passwordConfirmationError }}</p>
@@ -181,6 +185,30 @@ import { registerSchema } from '@/core/schemas/auth';
 import { showAccess, useRegister } from '@/core/services/authService.ts'
 import { useGetErrorMessage } from '@/core/common/composables/errorHooks.ts';
 import MyLogo from '../../shared/assets/LogoBacheton.vue';
+
+// 🔐 Bloquea caracteres especiales en nombre
+function blockSpecialChars(event: KeyboardEvent) {
+  const regex = /^[a-zA-Z0-9\sáéíóúÁÉÍÓÚñÑ]$/;
+  if (!regex.test(event.key)) {
+    event.preventDefault();
+  }
+}
+
+// 🔐 Bloquea caracteres peligrosos en email
+function blockEmailSpecialChars(event: KeyboardEvent) {
+  const allowedChars = /^[a-zA-Z0-9@._\-]$/;
+  if (!allowedChars.test(event.key)) {
+    event.preventDefault();
+  }
+}
+
+// 🧼 Sanitización adicional antes de enviar
+function sanitizeInput(input: string): string {
+  const div = document.createElement('div');
+  div.textContent = input;
+  return div.innerHTML.trim();
+}
+
 
 // Responsividad
 const screenWidth = ref(window.innerWidth);
@@ -247,7 +275,15 @@ const { mutate: registerUser, isPending: isLoading } = useRegister();
 
 const onSubmit = handleSubmit(async (values) => {
   errorMessage.value = null;
-  const payload = { name: values.name, email: values.email, password: values.password };
+  const sanitizedName = sanitizeInput(values.name);
+  const sanitizedEmail = sanitizeInput(values.email);
+
+  const payload = {
+    name: sanitizedName,
+    email: sanitizedEmail,
+    password: values.password
+  };
+
   registerUser(payload, {
     onSuccess: async (res) => {
       authStore.setAuth(true);
@@ -260,5 +296,6 @@ const onSubmit = handleSubmit(async (values) => {
     }
   });
 });
+
 </script>
 

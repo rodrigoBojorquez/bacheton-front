@@ -5,6 +5,9 @@ import { listRoles } from '@/core/services/rolesService';
 import type { User, AddUserRequest, EditUserRequest } from '@/core/types/user';
 import type { Role } from '@/core/types/role';
 import { FilterMatchMode } from '@primevue/core/api';
+import { useAuthStore } from '@/core/stores/authStore'
+
+const authStore = useAuthStore()
 
 const users = ref<User[]>([]);
 const selectedUsers = ref<User[]>([]);
@@ -12,6 +15,27 @@ const userDialog = ref(false);
 const deleteUserDialog = ref(false);
 const isEditMode = ref(false);
 const submitted = ref(false);
+
+// Función para sanitizar el input antes de enviarlo (quita HTML y espacios peligrosos)
+function sanitizeInput(input: string): string {
+  const div = document.createElement('div');
+  div.textContent = input;
+  return div.innerHTML.trim();
+}
+
+// Bloquea caracteres especiales al escribir (solo letras, números, @, puntos y guiones bajos para email, letras para nombre)
+function blockSpecialChars(event: KeyboardEvent, type: 'name' | 'email') {
+  let allowedChars;
+  if (type === 'name') {
+    allowedChars = /^[a-zA-ZÀ-ÿ\u00f1\u00d10-9\s]$/; // Letras, espacios, ñ, acentos, numeros
+  } else {
+    allowedChars = /^[a-zA-Z0-9@._\-]$/; // Letras, números, email chars
+  }
+  if (!allowedChars.test(event.key)) {
+    event.preventDefault();
+  }
+}
+
 
 // Formulario para creación/edición (NO incluye id como editable)
 const userForm = ref<Partial<AddUserRequest & { id?: string }>>({
@@ -80,6 +104,10 @@ async function saveUser() {
     return;
   }
 
+  // Sanitizar los campos antes de enviar
+  userForm.value.name = sanitizeInput(userForm.value.name);
+  userForm.value.email = sanitizeInput(userForm.value.email);
+
   // Contraseña obligatoria SOLO para creación
   if (!isEditMode.value) {
     if (!userForm.value.password?.trim()) {
@@ -93,6 +121,9 @@ async function saveUser() {
   try {
     if (isEditMode.value && userForm.value.id) {
       await editUserMutation.mutateAsync(userForm.value as EditUserRequest);
+      if (userForm.value.id === authStore.decodedUserId) {
+        await authStore.refreshUserInfo(); // Refresca nombre y rol
+      }
     } else {
       await addUserMutation.mutateAsync(userForm.value as AddUserRequest);
     }
@@ -104,10 +135,12 @@ async function saveUser() {
   }
 }
 
+
 function confirmDeleteUser(user: User) {
   userForm.value = { ...user };
   deleteUserDialog.value = true;
 }
+
 
 async function deleteUser() {
   try {
@@ -128,11 +161,12 @@ async function deleteUser() {
         <Button label="Nuevo" icon="pi pi-plus"
                 class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mr-3"
                 @click="openNew" />
-        <Button label="Eliminar" icon="pi pi-trash"
-                severity="danger"
-                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-                @click="confirmDeleteUser(selectedUsers[0])"
-                :disabled="!selectedUsers.length" />
+                <Button label="Eliminar" icon="pi pi-trash"
+        severity="danger"
+        class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+        @click="confirmDeleteUser(selectedUsers[0])"
+        :disabled="!selectedUsers.length || selectedUsers.some(u => u.id === authStore.decodedUserId)" />
+
       </template>
     </Toolbar>
 
@@ -173,10 +207,11 @@ async function deleteUser() {
             <Button icon="pi pi-pencil"
                     class="p-button-rounded p-button-outlined bg-green-500 hover:bg-green-600 text-white"
                     @click="editUser(slotProps.data)" />
-            <Button icon="pi pi-trash"
-                    severity="danger"
-                    class="p-button-rounded p-button-outlined bg-red-500 hover:bg-red-600 text-white"
-                    @click="confirmDeleteUser(slotProps.data)" />
+            <Button v-if="slotProps.data.id !== authStore.decodedUserId"
+              icon="pi pi-trash"
+              severity="danger"
+              class="p-button-rounded p-button-outlined bg-red-500 hover:bg-red-600 text-white"
+              @click="confirmDeleteUser(slotProps.data)" />
           </div>
         </template>
       </Column>
@@ -189,14 +224,24 @@ async function deleteUser() {
           <label for="name" class="block text-sm font-medium primary">
             Nombre <span class="text-red-500">*</span>
           </label>
-          <InputText id="name" v-model="userForm.name" class="mt-1 block w-full border border-gray-300 rounded-md p-2" />
+          <InputText
+              id="name"
+              v-model="userForm.name"
+              class="mt-1 block w-full border border-gray-300 rounded-md p-2"
+              @keypress="(e) => blockSpecialChars(e, 'name')"
+            />
           <small v-if="submitted && !userForm.name?.trim()" class="p-error text-red-500">El nombre es obligatorio.</small>
         </div>
         <div>
           <label for="email" class="block text-sm font-medium primary">
             Email <span class="text-red-500">*</span>
           </label>
-          <InputText id="email" v-model="userForm.email" class="mt-1 block w-full border border-gray-300 rounded-md p-2" />
+          <InputText
+              id="email"
+              v-model="userForm.email"
+              class="mt-1 block w-full border border-gray-300 rounded-md p-2"
+              @keypress="(e) => blockSpecialChars(e, 'email')"
+            />
           <small v-if="submitted && !userForm.email?.trim()" class="p-error text-red-500">El email es obligatorio.</small>
         </div>
 

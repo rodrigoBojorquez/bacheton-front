@@ -48,22 +48,18 @@
       </button>
 
       <!-- Menú Rápido -->
-      <div class="layout-topbar-menu hidden lg:block">
-        <div class="layout-topbar-menu-content">
-          <button type="button" class="layout-topbar-action">
-            <i class="pi pi-calendar"></i>
-            <span>Calendar</span>
-          </button>
-          <button type="button" class="layout-topbar-action">
-            <i class="pi pi-inbox"></i>
-            <span>Messages</span>
-          </button>
-          <button type="button" class="layout-topbar-action" @click="toggleAdminMenu">
-            <i class="pi pi-user"></i>
-            <span>Profile</span>
-          </button>
-        </div>
-      </div>
+      <div class="flex items-center space-x-2">
+        <div v-if="authStore.isAuth">
+    <div class=" text-md text-primary font-semibold">{{ authStore.userName }}</div>
+    <div class="text-xs font-semibold">{{ authStore.userRole }}</div>
+  </div>
+  <button type="button" class="layout-topbar-action" @click="toggleAdminMenu">
+    <i class="pi pi-user"></i>
+    <span>Profile</span>
+  </button>
+
+</div>
+
 
       <!-- Menú Perfil -->
       <AdminToggle ref="adminToggleRef" />
@@ -84,11 +80,14 @@ import { useLayoutStore } from '@/core/stores/useLayoutStore';
 import AppConfigurator from '../AppConfigurator.vue';
 import AdminToggle from './AdminToggle.vue';
 import MyLogo from '../../assets/LogoBacheton.vue';
+import { useAuthStore } from '@/core/stores/authStore';
 
 const layoutStore = useLayoutStore();
 const adminToggleRef = ref<InstanceType<typeof AdminToggle> | null>(null);
 const configPanelRef = ref<InstanceType<typeof AppConfigurator> | null>(null);
 const configButtonRef = ref<HTMLButtonElement | null>(null);
+  const authStore = useAuthStore()
+
 
 const toggleAdminMenu = (event: MouseEvent): void => {
   adminToggleRef.value?.toggleMenu(event);
