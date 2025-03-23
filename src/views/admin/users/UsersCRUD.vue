@@ -206,6 +206,7 @@ async function deleteUser() {
             Contraseña <span v-if="!isEditMode" class="text-red-500">*</span>
           </label>
           <Password id="password" v-model="userForm.password" toggleMask :feedback="false" class="mt-1 block w-full border border-gray-300 rounded-md p-2" />
+          <small v-if="submitted && !userForm.password?.trim() && !isEditMode" class="p-error text-red-500">La contraseña es obligatoria.</small>
           <small v-if="submitted && userForm.password?.trim() && !validPassword(userForm.password)" class="p-error text-red-500">
             La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.
           </small>
