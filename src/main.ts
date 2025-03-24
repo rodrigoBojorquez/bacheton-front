@@ -70,6 +70,16 @@ app.use(PrimeVue, {
     options: {
       darkModeSelector: '.app-dark'
     }
+  },
+  locale: {
+    startsWith: 'Empieza con',
+    contains: 'Contiene',
+    notContains: 'No contiene',
+    endsWith: 'Termina con',
+    equals: 'Igual a',
+    notEquals: 'Diferente de',
+    noFilter: 'Sin Filtro',
+
   }
 });
 

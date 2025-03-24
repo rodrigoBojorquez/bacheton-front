@@ -2,11 +2,10 @@
 import { apiClient } from "@/core/common/configuration/axiosClient.ts";
 import { useToastMutation } from "@/core/common/composables/serviceHooks";
 import { useMutation } from "@tanstack/vue-query";
-import type { CreateReportRequest } from "../types/report";
+import type { CreateReportRequest , ReportByUser, PaginatedResponse} from "../types/report";
 
 
 
-//cambiar s
 export function dataURLToFile(dataURL: string, filename: string): File {
   const arr = dataURL.split(",");
   const mime = arr[0].match(/:(.*?);/)?.[1] || "image/png";
@@ -18,6 +17,7 @@ export function dataURLToFile(dataURL: string, filename: string): File {
   }
   return new File([u8arr], filename, { type: mime });
 }
+
 
 
 async function createReport(data: CreateReportRequest): Promise<void> {
@@ -39,6 +39,13 @@ async function createReport(data: CreateReportRequest): Promise<void> {
       "Content-Type": "multipart/form-data",
     },
   });
+}
+
+export async function getUserReports(page: number, pageSize: number): Promise<PaginatedResponse<Report>> {
+  const { data } = await apiClient.get<PaginatedResponse<Report>>("/Reports/user", {
+    params: { page, pageSize }
+  });
+  return data;
 }
 
 

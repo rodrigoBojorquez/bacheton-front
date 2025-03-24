@@ -4,7 +4,9 @@ import UserDashboard from "@/shared/layouts/user/UserDashboard.vue";
 
 const userRoutes = [
   {
-    path: "/user",
+    path: "/app",
+    name: "app",
+
     component: UserDashboard,
     meta: { requiresAuth: true },
     children: [
