@@ -31,6 +31,8 @@ import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 import Toolbar from 'primevue/toolbar';
 import MultiSelect from 'primevue/multiselect';
+import Chart from 'primevue/chart';
+
 
 // Importaciones de componentes PrimeVue para el Mapa
 import Tag from 'primevue/tag';
@@ -85,6 +87,7 @@ app.component('IconField', IconField);
 app.component('InputIcon', InputIcon);
 app.component('Toolbar', Toolbar);
 app.component('MultiSelect', MultiSelect);
+app.component('Chart', Chart);
 
 //Nuevos componentes del mapa
 app.component('Tag', Tag);
