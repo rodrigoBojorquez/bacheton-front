@@ -107,6 +107,9 @@ async function savePermission() {
       :filters="filters"
       filterDisplay="menu"
       class="shadow"
+      :paginator="true"
+      :rows="10"
+      :rowsPerPageOptions="[5, 10, 25]"
     >
       <!-- Toolbar y filtro -->
       <Toolbar class="flex flex-col md:flex-row items-center justify-between mb-4 gap-4">
