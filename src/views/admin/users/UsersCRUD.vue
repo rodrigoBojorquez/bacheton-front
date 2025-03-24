@@ -1,19 +1,41 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useToast } from 'primevue/usetoast';
 import { listUsers, useAddUser, useEditUser, useDeleteUser } from '@/core/services/userService';
 import { listRoles } from '@/core/services/rolesService';
 import type { User, AddUserRequest, EditUserRequest } from '@/core/types/user';
 import type { Role } from '@/core/types/role';
 import { FilterMatchMode } from '@primevue/core/api';
+import { useAuthStore } from '@/core/stores/authStore'
 
-const toast = useToast();
+const authStore = useAuthStore()
+
 const users = ref<User[]>([]);
 const selectedUsers = ref<User[]>([]);
 const userDialog = ref(false);
 const deleteUserDialog = ref(false);
 const isEditMode = ref(false);
 const submitted = ref(false);
+
+// Función para sanitizar el input antes de enviarlo (quita HTML y espacios peligrosos)
+function sanitizeInput(input: string): string {
+  const div = document.createElement('div');
+  div.textContent = input;
+  return div.innerHTML.trim();
+}
+
+// Bloquea caracteres especiales al escribir (solo letras, números, @, puntos y guiones bajos para email, letras para nombre)
+function blockSpecialChars(event: KeyboardEvent, type: 'name' | 'email') {
+  let allowedChars;
+  if (type === 'name') {
+    allowedChars = /^[a-zA-ZÀ-ÿ\u00f1\u00d10-9\s]$/; // Letras, espacios, ñ, acentos, numeros
+  } else {
+    allowedChars = /^[a-zA-Z0-9@._\-]$/; // Letras, números, email chars
+  }
+  if (!allowedChars.test(event.key)) {
+    event.preventDefault();
+  }
+}
+
 
 // Formulario para creación/edición (NO incluye id como editable)
 const userForm = ref<Partial<AddUserRequest & { id?: string }>>({
@@ -39,7 +61,7 @@ async function loadUsers() {
     const response = await listUsers();
     users.value = response.items;
   } catch {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Error cargando usuarios' });
+
   }
 }
 
@@ -48,7 +70,7 @@ async function loadRoles() {
     const response = await listRoles();
     roles.value = response.items;
   } catch {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Error cargando roles' });
+
   }
 }
 
@@ -60,7 +82,7 @@ function openNew() {
 }
 
 function editUser(user: User) {
-  userForm.value = { ...user, password: '' }; // No mostramos contraseña actual
+  userForm.value = { ...user, password: '' };
   isEditMode.value = true;
   submitted.value = false;
   userDialog.value = true;
@@ -82,6 +104,10 @@ async function saveUser() {
     return;
   }
 
+  // Sanitizar los campos antes de enviar
+  userForm.value.name = sanitizeInput(userForm.value.name);
+  userForm.value.email = sanitizeInput(userForm.value.email);
+
   // Contraseña obligatoria SOLO para creación
   if (!isEditMode.value) {
     if (!userForm.value.password?.trim()) {
@@ -95,6 +121,9 @@ async function saveUser() {
   try {
     if (isEditMode.value && userForm.value.id) {
       await editUserMutation.mutateAsync(userForm.value as EditUserRequest);
+      if (userForm.value.id === authStore.decodedUserId) {
+        await authStore.refreshUserInfo(); // Refresca nombre y rol
+      }
     } else {
       await addUserMutation.mutateAsync(userForm.value as AddUserRequest);
     }
@@ -102,14 +131,16 @@ async function saveUser() {
     userDialog.value = false;
     userForm.value = { name: '', email: '', password: '', roleId: '' };
   } catch {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Error al guardar el usuario' });
+
   }
 }
+
 
 function confirmDeleteUser(user: User) {
   userForm.value = { ...user };
   deleteUserDialog.value = true;
 }
+
 
 async function deleteUser() {
   try {
@@ -118,7 +149,7 @@ async function deleteUser() {
     deleteUserDialog.value = false;
     userForm.value = { name: '', email: '', password: '', roleId: '' };
   } catch {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Error al eliminar el usuario' });
+
   }
 }
 </script>
@@ -130,11 +161,12 @@ async function deleteUser() {
         <Button label="Nuevo" icon="pi pi-plus"
                 class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mr-3"
                 @click="openNew" />
-        <Button label="Eliminar" icon="pi pi-trash"
-                severity="danger"
-                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-                @click="confirmDeleteUser(selectedUsers[0])"
-                :disabled="!selectedUsers.length" />
+                <Button label="Eliminar" icon="pi pi-trash"
+        severity="danger"
+        class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+        @click="confirmDeleteUser(selectedUsers[0])"
+        :disabled="!selectedUsers.length || selectedUsers.some(u => u.id === authStore.decodedUserId)" />
+
       </template>
     </Toolbar>
 
@@ -175,10 +207,11 @@ async function deleteUser() {
             <Button icon="pi pi-pencil"
                     class="p-button-rounded p-button-outlined bg-green-500 hover:bg-green-600 text-white"
                     @click="editUser(slotProps.data)" />
-            <Button icon="pi pi-trash"
-                    severity="danger"
-                    class="p-button-rounded p-button-outlined bg-red-500 hover:bg-red-600 text-white"
-                    @click="confirmDeleteUser(slotProps.data)" />
+            <Button v-if="slotProps.data.id !== authStore.decodedUserId"
+              icon="pi pi-trash"
+              severity="danger"
+              class="p-button-rounded p-button-outlined bg-red-500 hover:bg-red-600 text-white"
+              @click="confirmDeleteUser(slotProps.data)" />
           </div>
         </template>
       </Column>
@@ -191,14 +224,24 @@ async function deleteUser() {
           <label for="name" class="block text-sm font-medium primary">
             Nombre <span class="text-red-500">*</span>
           </label>
-          <InputText id="name" v-model="userForm.name" class="mt-1 block w-full border border-gray-300 rounded-md p-2" />
+          <InputText
+              id="name"
+              v-model="userForm.name"
+              class="mt-1 block w-full border border-gray-300 rounded-md p-2"
+              @keypress="(e) => blockSpecialChars(e, 'name')"
+            />
           <small v-if="submitted && !userForm.name?.trim()" class="p-error text-red-500">El nombre es obligatorio.</small>
         </div>
         <div>
           <label for="email" class="block text-sm font-medium primary">
             Email <span class="text-red-500">*</span>
           </label>
-          <InputText id="email" v-model="userForm.email" class="mt-1 block w-full border border-gray-300 rounded-md p-2" />
+          <InputText
+              id="email"
+              v-model="userForm.email"
+              class="mt-1 block w-full border border-gray-300 rounded-md p-2"
+              @keypress="(e) => blockSpecialChars(e, 'email')"
+            />
           <small v-if="submitted && !userForm.email?.trim()" class="p-error text-red-500">El email es obligatorio.</small>
         </div>
 
@@ -207,7 +250,7 @@ async function deleteUser() {
           <label for="password" class="block text-sm font-medium primary">
             Contraseña <span v-if="!isEditMode" class="text-red-500">*</span>
           </label>
-          <Password id="password" v-model="userForm.password" toggleMask class="mt-1 block w-full border border-gray-300 rounded-md p-2" />
+          <Password id="password" v-model="userForm.password" toggleMask :feedback="false" class="mt-1 block w-full border border-gray-300 rounded-md p-2" />
           <small v-if="submitted && !userForm.password?.trim() && !isEditMode" class="p-error text-red-500">La contraseña es obligatoria.</small>
           <small v-if="submitted && userForm.password?.trim() && !validPassword(userForm.password)" class="p-error text-red-500">
             La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.
