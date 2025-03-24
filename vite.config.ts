@@ -14,9 +14,11 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      'cropperjs/dist/cropper.css': '/node_modules/cropperjs/dist/cropper.js',
     },
   },
+
 
   server: {
     allowedHosts: ['c47a-201-163-129-179.ngrok-free.app']
