@@ -5,6 +5,7 @@ import PermissionsCRUD from "@/views/admin/Permisions/PermissionsCRUD.vue";
 import RolesCRUD from "@/views/admin/roles/RolesCRUD.vue";
 import LoggingView from "@/views/admin/loggin/LoggView.vue";
 import MapReports from "@/views/admin/monitoring/MapReports.vue";
+import ReportCRUD from "@/views/admin/report/ReportCRUD.vue";
 
 const adminRoutes = [
   {
@@ -41,6 +42,11 @@ const adminRoutes = [
         path: "map",
         name: "map",
         component: MapReports
+      },
+      {
+        path: "reports",
+        name: "reports",
+        component: ReportCRUD
       },
     ]
   }
