@@ -179,21 +179,22 @@ function clearFilters() {
             <template #end>
                 <div class="flex flex-col md:flex-row items-center gap-4">
                     <Select v-model="filters.status.value" :options="statusOptions" optionLabel="label"
-                        optionValue="value" placeholder="Filtrar por Estado" class="w-40" />
+                        optionValue="value" placeholder="Estado" class="w-40" />
                     <Select v-model="filters.severity.value" :options="severityOptions" optionLabel="label"
-                        optionValue="value" placeholder="Filtrar por Severidad" class="w-40" />
+                        optionValue="value" placeholder="Severidad" class="w-40" />
                     <div class="flex flex-col sm:flex-row gap-2">
                         <Calendar v-model="startDate" showIcon dateFormat="dd/mm/yy" placeholder="Fecha inicial"
                             class="w-40" />
                         <Calendar v-model="endDate" showIcon dateFormat="dd/mm/yy" placeholder="Fecha final"
                             class="w-40" />
                     </div>
-                    <div class="p-inputgroup">
-                        <span class="p-inputgroup-addon">
-                            <i class="pi pi-search"></i>
-                        </span>
-                        <InputText v-model="filters.global.value" placeholder="Buscar reportes" />
-                    </div>
+                    <IconField iconPosition="left">
+                        <InputIcon>
+                            <i class="pi pi-search text-gray-500" />
+                        </InputIcon>
+                        <InputText v-model="filters.global.value" placeholder="Buscar reportes"
+                            class="border border-gray-300 rounded-md p-2" />
+                    </IconField>
                     <Button icon="pi pi-filter-slash" text rounded outlined title="Limpiar filtros" class="p-2"
                         @click="clearFilters" />
                 </div>
@@ -233,11 +234,6 @@ function clearFilters() {
                     </span>
                 </template>
             </Column>
-            <!-- <Column field="resolvedBy" header="Resuelto por" sortable class="py-2 px-4">
-                <template #body="slotProps">
-                    {{ slotProps.data.resolvedBy || '-' }}
-                </template>
-            </Column> -->
             <Column field="createDate" header="Fecha Creación" sortable class="py-2 px-4">
                 <template #body="slotProps">
                     {{ formatDate(slotProps.data.createDate) }}
