@@ -31,7 +31,6 @@ export const useAuthStore = defineStore('auth', () => {
 
     if (value) {
       const decoded = jwtDecode<TokenPayload>(value);
-      console.log(decoded);
       permissions.value = decoded.permissions ? decoded.permissions.split(',') : [];
       decodedUserId.value = decoded.nameid ?? null;
       fetchUserInfo(decodedUserId.value);
