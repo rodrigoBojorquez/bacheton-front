@@ -4,54 +4,12 @@ import AppMenuItem from './AdminMenuItem.vue';
 import { useAuthStore } from '@/core/stores/authStore.ts'
 import {
   mapPermissionsToMenu,
-  permissionToRouteMap
+  permissionToRouteMapForPanel
 } from '@/core/common/composables/authUtilities.ts'
 
-// interface MenuItem {
-//   label: string;
-//   icon?: string;
-//   to?: string;
-//   url?: string;
-//   target?: string;
-//   class?: string;
-//   separator?: boolean;
-//   items?: MenuItem[];
-// }
-
-// const model = ref<MenuItem[]>([
-//   {
-//     label: 'Home',
-//     items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/admin/dashboard' }]
-//   },
-//   {
-//         label: 'Gestión de Usuarios',
-//         icon: 'pi pi-fw pi-users',
-//         items: [
-//           {
-//             label: 'Usuarios',
-//             icon: 'pi pi-fw pi-id-card',
-//             to: '/admin/users'
-//           },
-//           {
-//             label: 'Roles',
-//             icon: 'pi pi-fw pi-address-book',
-//             to: '/admin/roles'
-//           },
-//           {
-//             label: 'Permisos',
-//             icon: 'pi pi-fw pi-lock',
-//             to: '/admin/permissions'
-//           }
-//         ]
-//       },
-//       {
-//     label: 'Gestión de Sistema',
-//     items: [{ label: 'Logs', icon: 'pi pi-fw pi-list', to: '/admin/logs' }]
-//   }
-// ]);
 
 const authStore = useAuthStore();
-const menuItems = computed(() => mapPermissionsToMenu(permissionToRouteMap, authStore.accessLevel!));
+const menuItems = computed(() => mapPermissionsToMenu(permissionToRouteMapForPanel, authStore.accessLevel!));
 
 </script>
 
