@@ -6,7 +6,7 @@ import authRoutes from "@/core/router/authRoutes.ts";
 import publicRoutes from "@/core/router/publicRoutes.ts";
 import adminRoutes from "@/core/router/adminRoutes.ts";
 import userRoutes from "@/core/router/userRoutes.ts";
-import supervisorRoutes from './SupervisorRoutes';
+import appRoutes from './appRoutes';
 /* import {isSuperAdmin} from "@/core/common/composables/authUtilities.ts"; */
 
 const router = createRouter({
@@ -15,8 +15,7 @@ const router = createRouter({
     ...authRoutes,
     ...publicRoutes,
     ...adminRoutes,
-    ...supervisorRoutes,
-    ...userRoutes,
+    ...appRoutes,
     {
       path: "/:pathMatch(.*)*",
       name: "not-found",
@@ -29,7 +28,7 @@ export default router
 
 router.beforeEach (async (to) => {
   const authStore = useAuthStore();
-  const { loading, isAuth } = storeToRefs(authStore);
+  const { loading, isAuth, permissions } = storeToRefs(authStore);
 
   // Esperar a que el estado de carga termine antes de continuar con la navegación
   if (loading.value) {
@@ -44,11 +43,13 @@ router.beforeEach (async (to) => {
   if (to.meta.requiresAuth && !isAuth.value) {
     return { name: "login" };
   }
-/*
-  if (to.meta.requiresAdminAccess) {
-    if (!isSuperAdmin())
-      return { name: "not-found" };
-  } */
+
+  if (to.meta.requiresPermission) {
+    const requiredPermission = to.meta.requiresPermission as string;
+    if (!permissions.value.includes(requiredPermission)) {
+      return { name: "not-found" }; // Redirigir a una página de error si no tiene el permiso
+    }
+  }
 });
 
 router.afterEach((to) => {

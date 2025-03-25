@@ -11,11 +11,13 @@ const adminRoutes = [
   {
     path: "/admin",
     component: AdminDashboard,
-    meta: { requiresAuth: true, requiresAdminAccess: true },
+    redirect: "/admin/dashboard",
+    meta: { requiresAuth: true, requiresPermission: "superAdmin:Administracion" },
     children: [
       {
         path: "dashboard",
         name: "dashboard",
+        
         component: DashboardView
       },
       {

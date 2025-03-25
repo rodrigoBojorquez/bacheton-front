@@ -38,8 +38,8 @@ export function mapPermissionsToMenu(
     .filter((item): item is MenuItem => item !== null)
 }
 
-export const permissionToRouteMap: PermissionToRouteMap = {
-  Inicio: {
+export const permissionToRouteMapForPanel: PermissionToRouteMap = {
+  "Inicio": {
     links: [
       {
         module: 'Administracion',
@@ -50,7 +50,7 @@ export const permissionToRouteMap: PermissionToRouteMap = {
       },
     ],
   },
-  Administracion: {
+  "Administracion": {
     links: [
       {
         module: 'Administracion',
@@ -86,7 +86,7 @@ export const permissionToRouteMap: PermissionToRouteMap = {
       },
     ],
   },
-  Reportes: {
+  "Reportes": {
     links: [
       {
         module: 'Reportes',
@@ -99,9 +99,13 @@ export const permissionToRouteMap: PermissionToRouteMap = {
         module: 'Reportes',
         permissions: ['monitoring', 'read'],
         name: 'Mapa',
-        route: '/admin/map',
+        route: '/app/map',
         icon: 'pi pi-fw pi-map',
       },
     ],
   },
+}
+
+const permissionToRouteMapForApp: PermissionToRouteMap = {
+
 }
