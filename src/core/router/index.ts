@@ -6,6 +6,7 @@ import authRoutes from "@/core/router/authRoutes.ts";
 import publicRoutes from "@/core/router/publicRoutes.ts";
 import adminRoutes from "@/core/router/adminRoutes.ts";
 import userRoutes from "@/core/router/userRoutes.ts";
+import supervisorRoutes from './SupervisorRoutes';
 /* import {isSuperAdmin} from "@/core/common/composables/authUtilities.ts"; */
 
 const router = createRouter({
@@ -14,6 +15,7 @@ const router = createRouter({
     ...authRoutes,
     ...publicRoutes,
     ...adminRoutes,
+    ...supervisorRoutes,
     ...userRoutes,
     {
       path: "/:pathMatch(.*)*",
