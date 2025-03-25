@@ -30,13 +30,13 @@
       </router-link>
 
       <!-- Nuevo Enlace: Administración (visible solo si el usuario tiene permisos) -->
-      <RouterLink v-if="canAccessPanel" :to="{ name: 'app-monitoring' }" class="flex items-center gap-2">
+      <RouterLink v-if="canAccessMap" :to="{ name: 'app-monitoring' }" class="flex items-center gap-2">
         <i class="pi pi-map text-2xl md:text-3xl text-primary"></i>
         <span class="hidden  md:inline-block text-lg md:text-xl">Mapa</span>
       </RouterLink>
 
       <!-- Nuevo Enlace: Administración (visible solo si el usuario tiene permisos) -->
-      <RouterLink v-if="canAccessMap" :to="{ name: 'dashboard' }" class="flex items-center gap-2">
+      <RouterLink v-if="canAccessPanel" :to="{ name: 'dashboard' }" class="flex items-center gap-2">
         <i class="pi pi-th-large text-2xl md:text-3xl text-primary"></i>
         <span class="hidden  md:inline-block text-lg md:text-xl">Panel</span>
       </RouterLink>
