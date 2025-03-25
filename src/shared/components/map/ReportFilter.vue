@@ -31,7 +31,11 @@ const statusOptions = [
 
 // Actualizar filtro
 function updateFilter(key: keyof MonitoringReportsRequest, value: any) {
-    const updatedFilter = { ...modelValue.value, [key]: value };
+    const updatedFilter = { 
+        ...modelValue.value, 
+        [key]: value,
+        page: 1  // Reset to first page when filtering
+    };
     emit('update:modelValue', updatedFilter);
 }
 
@@ -43,19 +47,16 @@ function handleSearch() {
 // Limpiar todos los filtros
 function clearAllFilters() {
     const clearedFilters: MonitoringReportsRequest = {
+        page: 1,
+        pageSize: modelValue.value.pageSize,
         reportStatus: null,
         reportSeverity: null,
         startDate: null,
-        endDate: null
+        endDate: null,
+        latitude: modelValue.value.latitude,
+        longitude: modelValue.value.longitude,
+        radiusKm: modelValue.value.radiusKm
     };
-
-      // Si hay más propiedades en tu modelo, asegúrate de preservar las que no son filtros
-    for (const key in modelValue.value) {
-        if (!Object.keys(clearedFilters).includes(key)) {
-            clearedFilters[key as keyof MonitoringReportsRequest] =
-                modelValue.value[key as keyof MonitoringReportsRequest];
-        }
-    }
 
     emit('update:modelValue', clearedFilters);
     handleSearch();
@@ -87,22 +88,44 @@ function formatDate(date: Date | null) {
         <template #start>
             <h2 class="m-0 text-xl font-bold">Monitoreo de Reportes</h2>
         </template>
-
+        
         <template #end>
             <div class="flex flex-col md:flex-row items-center gap-4">
-                <Dropdown :modelValue="modelValue.reportStatus"
-                    @update:modelValue="(value) => updateFilter('reportStatus', value)" :options="statusOptions"
-                    optionLabel="label" optionValue="value" placeholder="Estado" class="w-48" />
-
-                <Dropdown :modelValue="modelValue.reportSeverity"
-                    @update:modelValue="(value) => updateFilter('reportSeverity', value)" :options="severityOptions"
-                    optionLabel="label" optionValue="value" placeholder="Severidad" class="w-48" />
-
-                <DatePicker :modelValue="modelValue.startDate"
-                    @update:modelValue="(value) => updateFilter('startDate', value)" showIcon dateFormat="dd/mm/yy"
-                    placeholder="Fecha desde" class="w-48" />
-
-                <Button label="Limpiar" icon="pi pi-filter-slash" class="p-button-secondary" @click="clearAllFilters" />
+                <Dropdown 
+                    :modelValue="modelValue.reportStatus"
+                    @update:modelValue="(value) => updateFilter('reportStatus', value)"
+                    :options="statusOptions"
+                    optionLabel="label" 
+                    optionValue="value" 
+                    placeholder="Estado" 
+                    class="w-48" 
+                />
+                
+                <Dropdown 
+                    :modelValue="modelValue.reportSeverity"
+                    @update:modelValue="(value) => updateFilter('reportSeverity', value)"
+                    :options="severityOptions"
+                    optionLabel="label" 
+                    optionValue="value" 
+                    placeholder="Severidad" 
+                    class="w-48" 
+                />
+                
+                <DatePicker 
+                    :modelValue="modelValue.startDate"
+                    @update:modelValue="(value) => updateFilter('startDate', value)"
+                    showIcon 
+                    dateFormat="dd/mm/yy"
+                    placeholder="Fecha desde" 
+                    class="w-48" 
+                />
+                
+                <Button 
+                    label="Limpiar" 
+                    icon="pi pi-filter-slash" 
+                    class="p-button-secondary" 
+                    @click="clearAllFilters" 
+                />
             </div>
         </template>
     </Toolbar>

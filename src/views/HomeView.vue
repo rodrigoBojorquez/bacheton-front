@@ -4,7 +4,8 @@
     <main>
       <div class="flex flex-col max-w-7xl mx-auto px-4 sm:px-4 lg:px-4 py-6 space-y-12 mt-14">
         <!-- Sección Banner-->
-        <section class="rounded-xl shadow-lg overflow-hidden" :style="{ backgroundColor: darkMode ? surface700 : surface50 }">
+        <section class="rounded-xl shadow-lg overflow-hidden"
+          :style="{ backgroundColor: darkMode ? surface700 : surface50 }">
           <div class="flex flex-col md:flex-row">
             <div class="md:w-1/2 p-6 md:p-10 flex flex-col justify-between">
               <div>
@@ -12,15 +13,16 @@
                 <h4 class="font-medium text-xl mb-6" :style="{ color: darkMode ? surface100 : surface700 }">
                   Transformando las calles de nuestra ciudad
                 </h4>
-                <p class="font-normal text-base md:text-lg mb-8 leading-relaxed" :style="{ color: darkMode ? surface200 : surface600 }">
+                <p class="font-normal text-base md:text-lg mb-8 leading-relaxed"
+                  :style="{ color: darkMode ? surface200 : surface600 }">
                   Únete a nuestra iniciativa para mejorar la seguridad vial y la calidad de vida en nuestra comunidad.
                   Reporta baches y contribuye a un cambio positivo. Juntos podemos crear un entorno urbano más seguro y
                   agradable para todos.
                 </p>
               </div>
               <div class="mt-4 md:mt-6">
-                <Button class="w-full md:w-auto text-base font-medium" size="large" 
-                  :style="{ backgroundColor: primaryMain, color: '#fff' }">
+                <Button class="w-full md:w-auto text-base font-medium" size="large"
+                  :style="{ backgroundColor: primaryMain, color: '#fff' }" @click="navegar">
                   Reportar un Bache
                 </Button>
               </div>
@@ -29,25 +31,31 @@
             <!-- Imagen del banner -->
             <div class="md:w-1/2 order-first md:order-last">
               <div class="h-64 sm:h-80 md:h-full">
-                <img src="https://cdn1.matadornetwork.com/blogs/2/2018/04/Donceles-Ciudad-de-M%C3%A9xico.jpg" alt="Calles de México" class="w-full h-full object-cover" />
+                <img src="../shared/assets/img/Home-Bacheton.jpg" alt="Calles de México"
+                  class="w-full h-full object-cover" />
               </div>
             </div>
           </div>
         </section>
 
         <!-- Sección de Beneficios -->
-        <section class="rounded-xl shadow-lg p-6 md:p-10" :style="{ backgroundColor: darkMode ? surface700 : surface50 }">
-          <h2 class="text-2xl md:text-3xl font-bold mb-8 text-center md:text-left" :style="{ color: darkMode ? surface100 : surface800 }">
+        <section class="rounded-xl shadow-lg p-6 md:p-10"
+          :style="{ backgroundColor: darkMode ? surface700 : surface50 }">
+          <h2 class="text-2xl md:text-3xl font-bold mb-8 text-center md:text-left"
+            :style="{ color: darkMode ? surface100 : surface800 }">
             Beneficios de unirte a Bacheton
           </h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div v-for="(beneficio, index) in beneficios" :key="index" class="flex items-start space-x-5">
-              <div class="p-6 rounded-xl flex items-center justify-center flex-shrink-0" :style="{ backgroundColor: primaryMain }">
+              <div class="p-6 rounded-xl flex items-center justify-center flex-shrink-0"
+                :style="{ backgroundColor: primaryMain }">
                 <i :class="[beneficio.icon, 'text-2xl text-white']"></i>
               </div>
               <div>
-                <h5 class="text-lg font-bold mb-2" :style="{ color: darkMode ? surface100 : surface800 }">{{ beneficio.title }}</h5>
-                <p class="leading-relaxed" :style="{ color: darkMode ? surface200 : surface600 }">{{ beneficio.description }}</p>
+                <h5 class="text-lg font-bold mb-2" :style="{ color: darkMode ? surface100 : surface800 }">{{
+                  beneficio.title }}</h5>
+                <p class="leading-relaxed" :style="{ color: darkMode ? surface200 : surface600 }">{{
+                  beneficio.description }}</p>
               </div>
             </div>
           </div>
@@ -76,7 +84,8 @@
         </section>
 
         <!-- Sección de Funcionalidades con cards mejoradas -->
-        <section class="rounded-xl shadow-lg p-6 md:p-10" :style="{ backgroundColor: darkMode ? surface700 : surface50 }">
+        <section class="rounded-xl shadow-lg p-6 md:p-10"
+          :style="{ backgroundColor: darkMode ? surface700 : surface50 }">
           <div class="mb-8 text-center">
             <h2 class="text-2xl md:text-3xl font-bold" :style="{ color: darkMode ? surface100 : surface800 }">
               Explora nuestras funcionalidades
@@ -88,15 +97,18 @@
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div v-for="(funcionalidad, index) in funcionalidades" :key="index" class="h-full">
-              <Card class="h-full shadow-md hover:shadow-lg transition-shadow duration-300" 
+              <Card class="h-full shadow-md hover:shadow-lg transition-shadow duration-300"
                 :style="{ backgroundColor: darkMode ? surface600 : 'white', borderColor: darkMode ? surface500 : surface200 }">
                 <template #header>
-                  <div class="h-48 flex items-center justify-center" :style="{ backgroundColor: darkMode ? surface500 : surface100 }">
-                    <i :class="['text-5xl', funcionalidad.icon || 'pi pi-map']" :style="{ color: primaryMain }"></i>
+                  <div class="h-48 flex items-center justify-center"
+                    :style="{ backgroundColor: darkMode ? surface500 : surface100 }">
+                    <img :src="funcionalidad.img" :alt="funcionalidad.title"
+                      class="h-full w-full object-cover rounded-t-lg" />
                   </div>
                 </template>
                 <template #title>
-                  <h5 class="text-xl font-bold" :style="{ color: darkMode ? surface100 : surface800 }">{{ funcionalidad.title }}</h5>
+                  <h5 class="text-xl font-bold" :style="{ color: darkMode ? surface100 : surface800 }">{{
+                    funcionalidad.title }}</h5>
                 </template>
                 <template #content>
                   <p class="leading-relaxed" :style="{ color: darkMode ? surface200 : surface600 }">
@@ -118,6 +130,20 @@ import Card from 'primevue/card';
 import PublicTopBar from '@/shared/layouts/public/PublicTopBar.vue';
 import { useLayoutStore } from '@/core/stores/useLayoutStore';
 import { primaryColors } from '@/shared/layouts/composables/layout';
+
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/core/stores/authStore';
+
+const router = useRouter();
+const authStore = useAuthStore();
+
+// Verifica si el usuario está autenticado
+const redireccion = computed(() => (authStore.isAuth ? 'app/report' : '/login'));
+
+// Función para navegar a la ruta correcta
+const navegar = () => {
+  router.push(redireccion.value);
+};
 
 // Configuración del tema
 const layoutStore = useLayoutStore();
@@ -213,22 +239,19 @@ const pasos = ref([
 // Información de Funcionalidades
 const funcionalidades = ref([
   {
-    icon: "pi pi-map",
-    title: "Mapa de baches",
-    description:
-      "Visualiza los baches reportados en tiempo real y encuentra las zonas más afectadas de tu ciudad.",
+    img: new URL('@/shared/assets/img/Bache-Img.jpg', import.meta.url).href,
+    title: "Captura de baches",
+    description: "Accede a la cámara para tomar una foto del bache y reportarlo fácilmente.",
   },
   {
-    icon: "pi pi-chart-bar",
-    title: "Estadísticas",
-    description:
-      "Accede a datos clave sobre los reportes y su resolución. Monitorea el progreso de tu comunidad.",
+    img: new URL('@/shared/assets/img/Mapa-img.png', import.meta.url).href,
+    title: "Ubicación en tiempo real",
+    description: "Activa la geolocalización para identificar con precisión la ubicación del bache y agilizar su registro en el mapa.",
   },
   {
-    icon: "pi pi-book",
-    title: "Guías de uso",
-    description:
-      "Aprende a utilizar todas las herramientas de Bacheton con nuestras guías paso a paso y tutoriales interactivos.",
+    img: new URL('@/shared/assets/img/Reporte-Img.jpg', import.meta.url).href,
+    title: "Monitorea tus reportes",
+    description: "Consulta el estado de los baches que has reportado y sigue el progreso de su resolución.",
   },
 ]);
 </script>
