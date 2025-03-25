@@ -13,16 +13,18 @@
     <!-- Vista principal con lista de reportes -->
     <div v-else>
       <div class="max-w-7xl mx-auto p-4">
-        <div class="flex flex-col md:flex-row items-center justify-between mb-4 gap-4">
-          <h2 class="text-xl font-semibold color-primary">Reportes</h2>
-          <Button
-            @click="openCamera"
-            class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Agregar Incidente
-          </Button>
-        </div>
 
+        <Toolbar class="flex flex-col md:flex-row items-center justify-between mb-4 gap-4">
+      <template #start>
+        <Button
+          label="Agregar"
+          icon="pi pi-plus"
+          class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mr-3"
+          @click="openCamera"
+        />
+
+      </template>
+    </Toolbar>
         <!-- Cargando o mostrando errores -->
         <div v-if="reportStore.isLoading">Cargando reportes...</div>
         <div v-else-if="reportStore.error">
@@ -45,17 +47,15 @@
           >
             <template #header>
               <div class="flex flex-wrap gap-2 items-center justify-between">
-                <h4 class="m-0 text-lg font-bold">Reportes</h4>
+                <h2 class="text-xl font-semibold color-primary">Reportes</h2>
                 <div class="relative w-64">
                   <!-- Ícono a la izquierda -->
-                  <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <i class="pi pi-search text-gray-400"></i>
-                  </span>
-                  <InputText
-                    v-model="filters.global.value"
-                    placeholder="Búsqueda global"
-                    class="pl-9 pr-4 py-2 w-full bg-gray-700 text-white rounded-md border border-gray-300"
-                  />
+                  <IconField iconPosition="left">
+            <InputIcon>
+              <i class="pi pi-search text-gray-500" />
+            </InputIcon>
+            <InputText v-model="filters.global.value" placeholder="Busqueda Global" class="border border-gray-300 rounded-md p-2" />
+          </IconField>
                 </div>
               </div>
             </template>
@@ -63,7 +63,7 @@
             <template #empty> No se encontraron reportes. </template>
 
             <!-- Columna: Reporte -->
-            <Column header="Reporte" style="min-width: 4rem">
+            <Column header="#" style="min-width: 4rem">
               <template #body="{ index }">
                 Reporte # {{ getGlobalIndex(index) }}
               </template>
@@ -272,7 +272,7 @@ const getSeverity = (report: { status: string }): string => {
     case 'Pending':
       return 'danger'
     case 'InProgress':
-      return 'warning'
+      return 'warn'
     case 'Resolved':
       return 'success'
     default:

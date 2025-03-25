@@ -35,7 +35,7 @@
               id="location"
               class="w-full border p-3 rounded text-lg"
             />
-            <label for="location" class="text-lg">Ingrese la ubicación</label>
+            <label for="location" class="text-lg">Referencias</label>
           </FloatLabel>
           <ErrorMessage name="location">
             <template #default="{ message }">
