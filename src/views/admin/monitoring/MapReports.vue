@@ -164,15 +164,58 @@ function closeAllInfoWindows() {
 function updateMapMarkers() {
     if (!map.value || !window.google) return;
 
-    // Limpiar marcadores
+    // Limpiar marcadores existentes
     markers.value.forEach((marker) => marker.setMap(null));
     markers.value = [];
 
+    // Si no hay reportes, salir
     if (reports.value.length === 0) return;
 
+    // Crear límites para el mapa
     const bounds = new window.google.maps.LatLngBounds();
 
-    reports.value.forEach(report => {
+    // Filtrar reportes basado en todos los criterios
+    const filteredReports = reports.value.filter(report => {
+        // Filtro por estado
+        if (filters.value.reportStatus && report.status !== filters.value.reportStatus) {
+            return false;
+        }
+
+        // Filtro por severidad
+        if (filters.value.reportSeverity && report.severity !== filters.value.reportSeverity) {
+            return false;
+        }
+
+        // Filtro por fecha de inicio
+        if (filters.value.startDate) {
+            const startDate = new Date(filters.value.startDate);
+            const reportDate = new Date(report.createDate);
+            
+            // Comparar solo hasta el día, ignorando la hora
+            startDate.setHours(0, 0, 0, 0);
+            reportDate.setHours(0, 0, 0, 0);
+
+            if (reportDate < startDate) {
+                return false;
+            }
+        }
+        return true;
+    });
+
+    // Si no hay reportes después del filtrado, salir
+    if (filteredReports.length === 0) {
+        // Opcional: podrías mostrar un mensaje de que no hay reportes que coincidan
+        toast.add({ 
+            severity: 'info', 
+            summary: 'Filtrado', 
+            detail: 'No se encontraron reportes que coincidan con los filtros seleccionados' 
+        });
+        return;
+    }
+
+    // Crear marcadores solo para los reportes filtrados
+    filteredReports.forEach(report => {
+        // Validar coordenadas
         if (isNaN(report.latitude) || isNaN(report.longitude)) return;
 
         const position = { lat: report.latitude, lng: report.longitude };
@@ -184,7 +227,7 @@ function updateMapMarkers() {
             icon: getMarkerIcon(report.status)
         });
 
-        // Usar el nuevo método para crear InfoWindow con Vue
+        // Añadir evento de clic para InfoWindow
         marker.addListener('click', () => {
             createInfoWindowWithVue(report, marker);
         });
@@ -193,11 +236,13 @@ function updateMapMarkers() {
         bounds.extend(position);
     });
 
-    // Ajustar el mapa para mostrar todos los marcadores
+    // Ajustar mapa solo a los marcadores filtrados
     if (markers.value.length > 0 && map.value) {
         map.value.fitBounds(bounds);
-        if (map.value.getZoom() && map.value.getZoom() > 15) {
-            map.value.setZoom(15);
+        
+        // Ajustar zoom para no acercarse demasiado
+        if (map.value.getZoom() > 10) {
+            map.value.setZoom(10);
         }
     }
 }
