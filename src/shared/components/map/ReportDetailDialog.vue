@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useAuthStore } from '@/core/stores/authStore.ts';
 import type { Report } from '@/core/types/reportMap';
 
 const props = defineProps<{
@@ -7,6 +8,9 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(['update:visible', 'edit', 'delete']);
+
+// Acceder al store de autenticación
+const authStore = useAuthStore();
 
 // Formatear fecha
 function formatDate(dateString: string | undefined): string {
@@ -18,7 +22,7 @@ const getSeverity = (severity: string) => {
     switch (severity) {
         case 'High': return 'danger'; // Rojo
         case 'Medium': return 'warn'; // Naranja
-        case 'Low': return 'info'; // Axul
+        case 'Low': return 'info'; // Azul
         default: return 'secondary'; // Gris
     }
 };
@@ -110,7 +114,7 @@ function deleteReport() {
 
                     <h5 class="font-medium text-gray-600 mt-4 mb-1">Estado</h5>
                     <Tag :severity="getStatusSeverity(report.status)" :value="getStatusText(report.status)" />
-                    
+
                     <div v-if="report.imageUrl" class="mt-4">
                         <h5 class="font-medium text-gray-600 mb-1">Imagen</h5>
                         <img :src="getImageUrl(report.imageUrl)" alt="Imagen del reporte"
@@ -124,7 +128,7 @@ function deleteReport() {
             <div class="flex justify-end gap-2">
                 <Button label="Cerrar" icon="pi pi-times" class="p-button-outlined" @click="closeDialog" />
                 <Button label="Editar" icon="pi pi-pencil" class="p-button-warning" @click="editReport" />
-                <Button label="Eliminar" icon="pi pi-trash" class="p-button-danger" @click="deleteReport" />
+                <Button v-if="authStore.permissions.includes('superAdmin:Administracion')" label="Eliminar" icon="pi pi-trash" class="p-button-danger" @click="deleteReport" />
             </div>
         </template>
     </Dialog>
