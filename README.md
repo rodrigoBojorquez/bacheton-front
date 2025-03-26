@@ -34,7 +34,7 @@ Desarrollar una **aplicación web** que permita a los ciudadanos **reportar y da
 | **Andrés García Leyva** | Desarrollador Fullstack | [AndresGarciaLv](https://github.com/AndresGarciaLv)           | 22393199@utcancun.edu.mx   |  
 | **Dilan Gabriel Och Montero** | Desarrollador Frontend | [DilanOch2002](https://github.com/DilanOch2002)           | 21393216@utcancun.edu.mx  |  
 | **Juan Carlos López Can** | Desarrollador Frontend | [JCLC7](https://github.com/JCLC7)           | 19393056@utcancun.edu.mx   |  
-| **Ricardo Jesús Chi Chan** | Desarrollador Frontend | [GitHub](https://github.com/)           | correo@institucion.edu   |  
+| **Ricardo Jesús Chi Chan** | Desarrollador Frontend | [RicardojCh10](https://github.com/RicardojCh10)     | 22393166@utcancun.edumx   |  
 
 ## 🛠 Tecnologías y Librerías
 
@@ -66,7 +66,7 @@ Desarrollar una **aplicación web** que permita a los ciudadanos **reportar y da
 
 1. Clonar el repositorio:
    ```sh
-   git clone https://github.com/usuario/bacheton.git
+   git clone https://github.com/rodrigoBojorquez/bacheton-front
    cd bacheton-front
    ```
 
@@ -74,13 +74,17 @@ Desarrollar una **aplicación web** que permita a los ciudadanos **reportar y da
    ```sh
    npm install
    ```
+3. Crear archivo con variables de entorno:
+   ```sh
+   cp .env.example .env
+   ```
 
-3. Ejecutar el proyecto en modo desarrollo:
+4. Ejecutar el proyecto en modo desarrollo:
    ```sh
    npm run dev
    ```
 
-4. Abrir en el navegador `http://localhost:5173`.
+5. Abrir en el navegador `http://localhost:5173`.
 
 ---
 

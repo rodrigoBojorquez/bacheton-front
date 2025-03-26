@@ -1,22 +1,27 @@
 import {apiClient} from "@/core/common/configuration/axiosClient.ts";
-import type {AuthResponse, LoginRequest, RegisterRequest} from "@/core/types/auth.ts";
+import type {
+  AccessLevel,
+  AuthResponse,
+  LoginRequest,
+  RegisterRequest
+} from '@/core/types/auth.ts'
 import {useToastMutation} from "@/core/common/composables/serviceHooks.ts";
 import {useMutation} from "@tanstack/vue-query";
 import {useAuthStore} from "@/core/stores/authStore.ts"
 
 const loginUser = async (request: LoginRequest): Promise<AuthResponse> => {
-  const {data} = await apiClient.post('/auth/login', request)
+  const {data} = await apiClient.post('/Auth/login', request)
   return data
 }
 
-const registerUser = async (request: LoginRequest): Promise<AuthResponse> => {
-  const {data} = await apiClient.post('/auth/register', request)
+const registerUser = async (request: RegisterRequest): Promise<AuthResponse> => {
+  const {data} = await apiClient.post('/Auth/register', request)
   return data
 }
 
 export const refreshToken = async (): Promise<AuthResponse> => {
   try {
-    const res = await apiClient.post<AuthResponse>('/auth/refresh-token')
+    const res = await apiClient.post<AuthResponse>('/Auth/refresh-token')
 
     const store = useAuthStore()
     store.setAuth(true)
@@ -29,13 +34,28 @@ export const refreshToken = async (): Promise<AuthResponse> => {
   }
 }
 
+export const showAccess = async (): Promise<AccessLevel> => {
+  try {
+    const res = await apiClient.post<AccessLevel>('/Auth/show-access')
+
+    const store = useAuthStore()
+    store.setAccessLevel(res.data)
+
+    return res.data
+  }
+  catch (e) {
+    console.error(e)
+    throw e
+  }
+}
+
 const logout = async () => {
-  await apiClient.post('/auth/logout')
+  await apiClient.post('/Auth/logout')
 }
 
 export function useLogin() {
   return useToastMutation<AuthResponse, LoginRequest>(loginUser, {
-    mutationKey: ["auth", "login"]
+    mutationKey: ["Auth", "login"]
   }, {
     loading: "Iniciando sesión ⏳",
     success: "Hola de nuevo! 😃",
@@ -47,7 +67,7 @@ export function useRefreshToken() {
 
   return useMutation({
     mutationFn: refreshToken,
-    mutationKey: ["auth", "refresh-token"],
+    mutationKey: ["Auth", "refresh-token"],
     onSuccess: (res) => {
       store.setAuth(true)
       store.setToken(res.token)
@@ -62,7 +82,7 @@ export function useRefreshToken() {
 
 export function useRegister() {
   return useToastMutation<AuthResponse, RegisterRequest>(registerUser, {
-    mutationKey: ["auth", "register"]
+    mutationKey: ["Auth", "register"]
   }, {
     success: "Bienvenido! 😃",
   })
@@ -70,7 +90,7 @@ export function useRegister() {
 
 export function useLogout() {
   return useToastMutation<void, void>(logout, {
-    mutationKey: ["auth", "logout"]
+    mutationKey: ["Auth", "logout"]
   }, {
     loading: "Cerrando sesión ⏳",
     success: "Hasta luego! 🫡",
