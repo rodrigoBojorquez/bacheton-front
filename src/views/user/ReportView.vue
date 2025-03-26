@@ -179,7 +179,7 @@ import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import ReportStepper from '@/shared/components/Report/ReportStepper.vue'
 
-const apiBaseUrl = "http://localhost:5000/"
+const apiBaseUrl = "https://api.bacheton.space"
 
 // Store de Reportes
 const reportStore = useReportStore()
