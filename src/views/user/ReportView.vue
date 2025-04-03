@@ -45,20 +45,24 @@
             :globalFilterFields="['status', 'location', 'comment']"
             class="shadow w-full"
           >
-            <template #header>
-              <div class="flex flex-wrap gap-2 items-center justify-between">
-                <h2 class="text-xl font-semibold color-primary">Reportes</h2>
-                <div class="relative w-64">
-                  <!-- Ícono a la izquierda -->
-                  <IconField iconPosition="left">
-            <InputIcon>
-              <i class="pi pi-search text-gray-500" />
-            </InputIcon>
-            <InputText v-model="filters.global.value" placeholder="Busqueda Global" class="border border-gray-300 rounded-md p-2" />
-          </IconField>
-                </div>
-              </div>
-            </template>
+          <template #header>
+  <div class="flex flex-wrap gap-2 items-center justify-between">
+    <h2 class="text-xl font-semibold color-primary">Reportes</h2>
+    <div class="relative w-full max-w-[300px] mx-auto md:mx-0">
+      <IconField iconPosition="left" class="w-full">
+        <InputIcon>
+          <i class="pi pi-search text-gray-500" />
+        </InputIcon>
+        <InputText
+          v-model="filters.global.value"
+          placeholder="Busqueda Global"
+          class="w-full border border-gray-300 rounded-md p-2"
+        />
+      </IconField>
+    </div>
+  </div>
+</template>
+
 
             <template #empty> No se encontraron reportes. </template>
 
