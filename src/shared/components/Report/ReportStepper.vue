@@ -65,13 +65,16 @@
 
         <!-- reCAPTCHA -->
         <div class="mb-6 flex justify-center">
-          <VueRecaptcha
-            ref="recaptcha"
-            sitekey="6LezVfsqAAAAADzSPWMGrrlEINkJ0ublHRx5d9rO"
-            @verify="onVerify"
-            @expired="onExpired"
-          />
-        </div>
+  <div class="flex justify-center items-center w-full max-w-[304px] md:max-w-[384px] mx-auto scale-90 md:scale-100">
+    <VueRecaptcha
+      ref="recaptcha"
+      sitekey="6LezVfsqAAAAADzSPWMGrrlEINkJ0ublHRx5d9rO"
+      @verify="onVerify"
+      @expired="onExpired"
+      :size="captchaSize"
+    />
+  </div>
+</div>
 
         <!-- Botón Guardar Reporte -->
         <div class="flex justify-center">
@@ -109,7 +112,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits } from 'vue'
+import { defineProps, defineEmits, onMounted, onBeforeUnmount, computed, ref } from 'vue'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 import * as yup from 'yup'
 import Button from 'primevue/button'
@@ -122,6 +125,24 @@ import Toast from 'primevue/toast'
 import Select from 'primevue/select'
 import VueRecaptcha from 'vue3-recaptcha2'
 
+// Lógica para tamaño responsivo (igual que antes)
+const windowWidth = ref(window.innerWidth)
+
+const updateWidth = () => {
+  windowWidth.value = window.innerWidth
+}
+
+onMounted(() => {
+  window.addEventListener('resize', updateWidth)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateWidth)
+})
+
+const captchaSize = computed(() => {
+  return windowWidth.value < 768 ? 'compact' : 'normal'
+})
 const confirm = useConfirm()
 const toast = useToast()
 
@@ -169,15 +190,9 @@ const onExpired = () => {
   captchaToken.value = ''
 }
 
-/**
- * handleSubmit:
- * 1. Valida el formulario (comment y location) con vee-validate.
- * 2. Verifica manualmente que "severity" no esté vacío.
- * 3. Verifica que el captcha esté resuelto.
- * 4. Muestra ConfirmDialog; al aceptar, emite "save" con todos los datos.
- */
+
 const handleSubmit = async (values: any, validate: Function) => {
-  console.log('Form values:', values)
+
   // Validar comment y location
   const isValid = await validate()
   if (!isValid) {
@@ -243,5 +258,9 @@ const handleSubmit = async (values: any, validate: Function) => {
 <style scoped>
 .p-error {
   color: red !important;
+}
+/* Solo necesario para ajustar el iframe interno */
+:deep(.g-recaptcha iframe) {
+  @apply w-full;
 }
 </style>

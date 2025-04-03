@@ -2,7 +2,7 @@
   <!-- Topbar -->
   <div class="layout-topbar relative flex items-center px-4 h-14">
     <!-- Sección Izquierda: Logo (solo visible en md o superior) -->
-    <div class="hidden  sm:hidden md:flex  items-center">
+    <div class="hidden sm:hidden md:flex items-center">
       <router-link :to="{ name: 'home' }" class="layout-topbar-logo">
         <MyLogo />
         <span>BACHETON</span>
@@ -62,7 +62,6 @@
     </div>
 
     <!-- Botón de menú móvil: visible solo en móvil -->
-    <!-- NOTA: Usamos 'justify-start' en vez de 'justify-left' -->
     <div class="flex md:hidden justify-start flex-1">
       <button @click="toggleMobileMenu" class="text-primary focus:outline-none">
         <i class="pi" :class="mobileMenuOpen ? 'pi-times text-2xl' : 'pi-bars text-2xl'"></i>
@@ -133,7 +132,7 @@
       v-if="mobileMenuOpen"
       class="md:hidden absolute top-14 left-0 w-64 shadow-lg z-50
              max-h-[calc(100vh-3.5rem)] overflow-y-auto"
-             :class="layoutStore.layoutConfig.darkTheme ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'"
+      :class="layoutStore.layoutConfig.darkTheme ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'"
     >
       <div class="flex flex-col gap-4 p-4">
         <router-link
@@ -193,10 +192,10 @@
   </transition>
 
   <AppConfigurator
-  ref="configPanelRef"
-  v-show="layoutStore.isConfiguratorOpen"
-  @closeConfigurator="closeConfigurator"
-/>
+    ref="configPanelRef"
+    v-show="layoutStore.isConfiguratorOpen"
+    @closeConfigurator="closeConfigurator"
+  />
 </template>
 
 <script setup lang="ts">
@@ -278,9 +277,17 @@ export default {
 
 <style scoped>
 .active-tab {
-  border-bottom: 2px solid currentColor;
-  color: currentColor;
+
+  color: var(--primary-color);
+  transition: background-color 0.2s ease;
+  display: inline-flex; /* Asegura que el área de hover sea lo suficientemente grande */
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: color-mix(in srgb, currentColor 30%, transparent) !important; /* Ajusta según tu diseño */
 }
+
+
+
 
 /* Transición para el menú móvil */
 .fade-enter-active,
