@@ -43,11 +43,12 @@
             </small>
           </div>
 
-          <!-- Rol solo lectura -->
-          <div>
-            <label class="mt-2 block font-medium mb-1">Rol</label>
-            <InputText v-model="authStore.userRole" class="w-full bg-gray-100 cursor-not-allowed" readonly />
-          </div>
+         <!-- Rol solo lectura: se muestra solo si el rol no es "Usuario" -->
+                  <div v-if="authStore.userRole !== 'Usuario'">
+                    <label class="mt-2 block font-medium mb-1">Rol</label>
+                    <InputText v-model="authStore.userRole" class="w-full bg-gray-100 cursor-not-allowed" readonly />
+                  </div>
+
 
           <!-- Botones -->
           <div class="flex justify-end gap-2 mt-4">

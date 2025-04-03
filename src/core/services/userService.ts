@@ -10,7 +10,9 @@
   export async function listUsers(page?: number, pageSize?: number, search?: string): Promise<ListResponse<User>> {
     const {data} = await apiClient.get('/Users', {
       params: { ...(page && { page }), ...(pageSize && { pageSize }), ...(search && { search }) }
+
     });
+    console.log(data);
     return data;
   }
 

@@ -31,8 +31,8 @@ const statusOptions = [
 
 // Actualizar filtro
 function updateFilter(key: keyof MonitoringReportsRequest, value: any) {
-    const updatedFilter = { 
-        ...modelValue.value, 
+    const updatedFilter = {
+        ...modelValue.value,
         [key]: value,
         page: 1  // Reset to first page when filtering
     };
@@ -88,45 +88,45 @@ function formatDate(date: Date | null) {
         <template #start>
             <h2 class="m-0 text-xl font-bold">Monitoreo de Reportes</h2>
         </template>
-        
+
         <template #end>
-            <div class="flex flex-col md:flex-row items-center gap-4">
-                <Dropdown 
+           <!--  <div class="flex flex-col md:flex-row items-center gap-4">
+                <Dropdown
                     :modelValue="modelValue.reportStatus"
                     @update:modelValue="(value) => updateFilter('reportStatus', value)"
                     :options="statusOptions"
-                    optionLabel="label" 
-                    optionValue="value" 
-                    placeholder="Estado" 
-                    class="w-48" 
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Estado"
+                    class="w-48"
                 />
-                
-                <Dropdown 
+
+                <Dropdown
                     :modelValue="modelValue.reportSeverity"
                     @update:modelValue="(value) => updateFilter('reportSeverity', value)"
                     :options="severityOptions"
-                    optionLabel="label" 
-                    optionValue="value" 
-                    placeholder="Severidad" 
-                    class="w-48" 
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Severidad"
+                    class="w-48"
                 />
-                
-                <DatePicker 
+
+                <DatePicker
                     :modelValue="modelValue.startDate"
                     @update:modelValue="(value) => updateFilter('startDate', value)"
-                    showIcon 
+                    showIcon
                     dateFormat="dd/mm/yy"
-                    placeholder="Fecha desde" 
-                    class="w-48" 
+                    placeholder="Fecha desde"
+                    class="w-48"
                 />
-                
-                <Button 
-                    label="Limpiar" 
-                    icon="pi pi-filter-slash" 
-                    class="p-button-secondary" 
-                    @click="clearAllFilters" 
+
+                <Button
+                    label="Limpiar"
+                    icon="pi pi-filter-slash"
+                    class="p-button-secondary"
+                    @click="clearAllFilters"
                 />
-            </div>
+            </div> -->
         </template>
     </Toolbar>
 </template>

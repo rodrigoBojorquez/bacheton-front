@@ -190,7 +190,7 @@ function updateMapMarkers() {
         if (filters.value.startDate) {
             const startDate = new Date(filters.value.startDate);
             const reportDate = new Date(report.createDate);
-            
+
             // Comparar solo hasta el día, ignorando la hora
             startDate.setHours(0, 0, 0, 0);
             reportDate.setHours(0, 0, 0, 0);
@@ -205,10 +205,10 @@ function updateMapMarkers() {
     // Si no hay reportes después del filtrado, salir
     if (filteredReports.length === 0) {
         // Opcional: podrías mostrar un mensaje de que no hay reportes que coincidan
-        toast.add({ 
-            severity: 'info', 
-            summary: 'Filtrado', 
-            detail: 'No se encontraron reportes que coincidan con los filtros seleccionados' 
+        toast.add({
+            severity: 'info',
+            summary: 'Filtrado',
+            detail: 'No se encontraron reportes que coincidan con los filtros seleccionados'
         });
         return;
     }
@@ -239,7 +239,7 @@ function updateMapMarkers() {
     // Ajustar mapa solo a los marcadores filtrados
     if (markers.value.length > 0 && map.value) {
         map.value.fitBounds(bounds);
-        
+
         // Ajustar zoom para no acercarse demasiado
         if (map.value.getZoom() > 10) {
             map.value.setZoom(10);
