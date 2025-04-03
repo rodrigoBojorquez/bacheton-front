@@ -53,7 +53,7 @@
     <div class=" text-md text-primary font-semibold">{{ authStore.userName }}</div>
     <div class="text-xs font-semibold">{{ authStore.userRole }}</div>
   </div>
-  <button type="button" class="layout-topbar-action" @click="toggleAdminMenu">
+  <button type="button" class="layout-topbar-action xs:mr-10" @click="toggleAdminMenu">
     <i class="pi pi-user"></i>
     <span>Profile</span>
   </button>

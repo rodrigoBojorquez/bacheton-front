@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { listUsers, useAddUser, useEditUser, useDeleteUser } from '@/core/services/userService';
 import { listRoles } from '@/core/services/rolesService';
 import type { User, AddUserRequest, EditUserRequest } from '@/core/types/user';
@@ -16,6 +16,12 @@ const deleteUserDialog = ref(false);
 const isEditMode = ref(false);
 const submitted = ref(false);
 
+// Agregamos variables para la paginación:
+const currentPage = ref(1);           // Página actual (1-indexado)
+const rows = ref(10);                 // Cantidad de elementos por página
+const totalItems = ref(0);            // Total de registros devueltos por el backend
+const firstRecord = computed(() => (currentPage.value - 1) * rows.value);  // Índice del primer registro de la página
+
 // Función para sanitizar el input antes de enviarlo (quita HTML y espacios peligrosos)
 function sanitizeInput(input: string): string {
   const div = document.createElement('div');
@@ -27,7 +33,7 @@ function sanitizeInput(input: string): string {
 function blockSpecialChars(event: KeyboardEvent, type: 'name' | 'email') {
   let allowedChars;
   if (type === 'name') {
-    allowedChars = /^[a-zA-ZÀ-ÿ\u00f1\u00d10-9\s]$/; // Letras, espacios, ñ, acentos, numeros
+    allowedChars = /^[a-zA-ZÀ-ÿ\u00f1\u00d10-9\s]$/; // Letras, espacios, ñ, acentos, números
   } else {
     allowedChars = /^[a-zA-Z0-9@._\-]$/; // Letras, números, email chars
   }
@@ -35,7 +41,6 @@ function blockSpecialChars(event: KeyboardEvent, type: 'name' | 'email') {
     event.preventDefault();
   }
 }
-
 
 // Formulario para creación/edición (NO incluye id como editable)
 const userForm = ref<Partial<AddUserRequest & { id?: string }>>({
@@ -56,12 +61,15 @@ onMounted(async () => {
   await loadRoles();
 });
 
+// Modificamos loadUsers para enviar los parámetros de paginación y actualizar totalItems:
 async function loadUsers() {
   try {
-    const response = await listUsers();
+    // Se envían currentPage y rows para la paginación, y opcionalmente el filtro global
+    const response = await listUsers(currentPage.value, rows.value, filters.value.global.value);
     users.value = response.items;
+    totalItems.value = response.totalItems;
   } catch {
-
+    // Manejo de error (opcional)
   }
 }
 
@@ -70,7 +78,7 @@ async function loadRoles() {
     const response = await listRoles();
     roles.value = response.items;
   } catch {
-
+    // Manejo de error (opcional)
   }
 }
 
@@ -131,16 +139,14 @@ async function saveUser() {
     userDialog.value = false;
     userForm.value = { name: '', email: '', password: '', roleId: '' };
   } catch {
-
+    // Manejo de error (opcional)
   }
 }
-
 
 function confirmDeleteUser(user: User) {
   userForm.value = { ...user };
   deleteUserDialog.value = true;
 }
-
 
 async function deleteUser() {
   try {
@@ -149,8 +155,15 @@ async function deleteUser() {
     deleteUserDialog.value = false;
     userForm.value = { name: '', email: '', password: '', roleId: '' };
   } catch {
-
+    // Manejo de error (opcional)
   }
+}
+
+// Implementación de la paginación en modo lazy: se actualizan currentPage y rows, y se recargan los datos.
+function onPageChange(event: { page: number; first: number; rows: number; pageCount: number }) {
+  currentPage.value = event.page + 1; // event.page es 0-indexado, se ajusta a 1-indexado
+  rows.value = event.rows;
+  loadUsers();
 }
 </script>
 
@@ -161,12 +174,11 @@ async function deleteUser() {
         <Button label="Nuevo" icon="pi pi-plus"
                 class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mr-3"
                 @click="openNew" />
-                <Button label="Eliminar" icon="pi pi-trash"
-        severity="danger"
-        class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-        @click="confirmDeleteUser(selectedUsers[0])"
-        :disabled="!selectedUsers.length || selectedUsers.some(u => u.id === authStore.decodedUserId)" />
-
+        <Button label="Eliminar" icon="pi pi-trash"
+                severity="danger"
+                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+                @click="confirmDeleteUser(selectedUsers[0])"
+                :disabled="!selectedUsers.length || selectedUsers.some(u => u.id === authStore.decodedUserId)" />
       </template>
     </Toolbar>
 
@@ -176,23 +188,27 @@ async function deleteUser() {
       v-model:selection="selectedUsers"
       dataKey="id"
       :paginator="true"
-      :rows="10"
+      :lazy="true"
+      :first="firstRecord"
+      :rows="rows"
+      :totalRecords="totalItems"
       paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
       :filters="filters"
       :rowsPerPageOptions="[5, 10, 25, 50]"
       currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
       filterDisplay="menu"
+      @page="onPageChange"
       class="shadow"
     >
       <template #header>
         <div class="flex flex-wrap gap-2 items-center justify-between">
           <h4 class="m-0 text-lg font-bold">Gestión de Usuarios</h4>
-          <IconField iconPosition="left">
+          <!-- <IconField iconPosition="left">
             <InputIcon>
               <i class="pi pi-search text-gray-500" />
             </InputIcon>
-            <InputText v-model="filters.global.value" placeholder="Buscar usuarios" class="border border-gray-300 rounded-md p-2" />
-          </IconField>
+            <InputText v-model="filters['global'].value" placeholder="Buscar usuarios" class="border border-gray-300 rounded-md p-2" />
+          </IconField> -->
         </div>
       </template>
 
@@ -208,10 +224,10 @@ async function deleteUser() {
                     class="p-button-rounded p-button-outlined bg-green-500 hover:bg-green-600 text-white"
                     @click="editUser(slotProps.data)" />
             <Button v-if="slotProps.data.id !== authStore.decodedUserId"
-              icon="pi pi-trash"
-              severity="danger"
-              class="p-button-rounded p-button-outlined bg-red-500 hover:bg-red-600 text-white"
-              @click="confirmDeleteUser(slotProps.data)" />
+                    icon="pi pi-trash"
+                    severity="danger"
+                    class="p-button-rounded p-button-outlined bg-red-500 hover:bg-red-600 text-white"
+                    @click="confirmDeleteUser(slotProps.data)" />
           </div>
         </template>
       </Column>

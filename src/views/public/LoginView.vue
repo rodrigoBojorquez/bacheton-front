@@ -20,7 +20,7 @@
       class="absolute left-0 right-0 transition-all duration-300"
       :style="{
         background: darkMode
-          ? `linear-gradient(to bottom, ${surface700} 0%, ${surface700} 20%, transparent 100%)`
+          ? `linear-gradient(to bottom, ${primaryMain} 0%, ${primaryMain} 20%, transparent 100%)`
           : `linear-gradient(to bottom, ${primaryMain} 0%, ${primaryLight} 20%, transparent 100%)`,
         height: '15%',
         top: 0
@@ -28,13 +28,11 @@
     ></div>
 
     <!-- Fondo inferior para pantallas pequeñas -->
-    <div
+  <div
       v-if="isSmallScreen"
       class="absolute left-0 right-0 transition-all duration-300"
       :style="{
-        background: darkMode
-          ? `linear-gradient(to top, ${surface700} 0%, ${surface700} 20%, transparent 100%)`
-          : `linear-gradient(to top, ${primaryMain} 0%, ${primaryLight} 20%, transparent 100%)`,
+        background: `linear-gradient(to top, ${primaryMain} 0%, ${primaryLight} 20%, transparent 100%)`,
         height: '15%',
         bottom: 0
       }"
